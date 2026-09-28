@@ -252,13 +252,12 @@
   .entrada-marca p { margin: 16px 0 0; max-width: 42ch; color: var(--marinho-suave); font-size: 16px; }
 
   /* cena decorativa: órbita das três esferas do logo (canvas, script no fim da página) */
-  .entrada-marca > :not(.cena-box) { position: relative; z-index: 1; }
-  .entrada-marca { justify-content: flex-start; }
-  .entrada-marca > div:not(.cena-box) { margin-top: clamp(24px, 7vh, 80px); }
-  .cena-box { position: static; display: flex; align-items: flex-end; min-height: 40px; margin-top: auto; }
-  .orbita { position: absolute; right: -9%; bottom: -44px; width: min(72%, 58vh); aspect-ratio: 1; display: block; cursor: pointer; touch-action: manipulation; z-index: 0; }
-  .cena-legenda { position: relative; z-index: 1; }
-  .cena-legenda { font: 400 11.5px var(--mono); color: var(--marinho-suave); letter-spacing: .02em; }
+  .entrada-marca { justify-content: flex-start; gap: 0; }
+  .entrada-marca > div:not(.cena-box) { margin-top: clamp(20px, 5vh, 56px); }
+  .cena-box { flex: 1; min-height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding-top: 24px; }
+  .quique { width: min(100%, 640px, calc((100vh - 480px) * 1.5)); aspect-ratio: 3 / 2; display: block; cursor: grab; touch-action: none; }
+  .quique:active { cursor: grabbing; }
+  .cena-legenda { text-align: center; font: 400 11.5px var(--mono); color: var(--marinho-suave); letter-spacing: .02em; }
 
   .entrada-painel { display: grid; place-items: center; padding: 40px 20px; }
   .entrada-cartao { width: min(420px, 100%); background: var(--cartao); border: 1px solid var(--linha); border-radius: 18px; box-shadow: var(--sombra); padding: 32px 28px; }
@@ -356,8 +355,8 @@
       <p>Entre para ver as animações de cada app rodando e copiar o código.</p>
     </div>
     <div class="cena-box" aria-hidden="true">
-      <canvas class="orbita" id="orbita"></canvas>
-      <span class="cena-legenda">órbita animasys · 3 esferas · clique para dar impulso</span>
+      <canvas class="quique" id="quique"></canvas>
+      <span class="cena-legenda">bola quicando · arraste a linha do tempo</span>
     </div>
   </div>
   <div class="entrada-painel">
@@ -1485,150 +1484,144 @@
 })();
 </script>
 <script>
-/* Órbita animasys: as três esferas do logo percorrem um nó trifólio em 3D,
-   cada uma puxando uma fita de duas faces (laranja na frente, grafite atrás).
-   Desacelera a cada volta formando o triângulo do logo; inclina com o mouse; clique dá impulso. */
+/* Bola quicando: o exercício clássico de animação, com a esfera do logo.
+   Achata no impacto, estica na queda, deixa o rastro dos quadros anteriores
+   e roda sobre uma linha do tempo de 48 quadros que dá para arrastar. */
 (function () {
-  var cv = document.getElementById('orbita');
+  var cv = document.getElementById('quique');
   if (!cv || !cv.getContext) return;
   var ctx = cv.getContext('2d');
   var REDUZIR = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var painel = cv.closest('.entrada-marca') || document.body;
+  var W = 0, H = 0, rodando = false, visivel = false, ultimo = 0, arrastando = false;
+  var DUR = 3.6, QUADROS = 48, t = REDUZIR ? 1.15 : 0;
 
-  var W = 0, H = 0, dpr = 1, rodando = false, visivel = false, ultimo = 0;
-  var fase = 0.6, relogio = 0, impulso = 0;
-  var incl = { x: 0, y: 0 }, alvo = { x: 0, y: 0 };
+  // alturas de cada trecho (0 a 1) e duração proporcional à raiz da altura, como na física
+  var ARCOS = [{ h: 1, d: 1, queda: true }, { h: 0.52, d: 2 * Math.sqrt(0.52) }, { h: 0.24, d: 2 * Math.sqrt(0.24) }, { h: 0.08, d: 2 * Math.sqrt(0.08) }];
+  var ROLAR = 0.55, TOTAL = ARCOS.reduce(function (s, a) { return s + a.d; }, 0) + ROLAR;
+  var impactos = [], chaves = [], acc = 0;
+  chaves.push(0);
+  ARCOS.forEach(function (a, i) { if (!a.queda) chaves.push((acc + a.d / 2) / TOTAL); acc += a.d; impactos.push(acc / TOTAL); chaves.push(acc / TOTAL); });
+  chaves.push(1);
 
-  var FRENTE = [[246, 162, 74], [236, 106, 36], [201, 39, 44], [140, 15, 37]];
-  var VERSO = [[64, 56, 53], [44, 39, 38], [32, 29, 29]];
-  var FUNDO = [27, 26, 28];
-  var PASSOS = 110, RASTRO = 2.1, TRES = Math.PI * 2 / 3;
-
-  function mistura(paleta, k) {
-    var p = Math.max(0, Math.min(1, k)) * (paleta.length - 1), i = Math.min(paleta.length - 2, Math.floor(p)), f = p - i;
-    var a = paleta[i], b = paleta[i + 1];
-    return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
+  // estado da bola num instante (0..1 do ciclo)
+  function estado(f) {
+    var u = f * TOTAL, a0 = 0, h = 0, vel = 0;
+    for (var i = 0; i < ARCOS.length; i++) {
+      var a = ARCOS[i];
+      if (u <= a0 + a.d) {
+        var x = u - a0;
+        if (a.queda) { h = 1 - x * x; vel = -2 * x; }
+        else { var m = a.d / 2, k = (x - m) / m; h = a.h * (1 - k * k); vel = -2 * a.h * k / m; }
+        break;
+      }
+      a0 += a.d;
+    }
+    // achatamento perto de cada impacto
+    var achata = 0;
+    impactos.forEach(function (p) { var dd = Math.abs(f - p) * TOTAL; if (dd < 0.07) achata = Math.max(achata, 1 - dd / 0.07); });
+    var forca = impactos.reduce(function (s, p, j) { return Math.abs(f - p) * TOTAL < 0.07 ? [0.34, 0.24, 0.14, 0.06][j] : s; }, 0);
+    var estica = Math.min(0.22, Math.abs(vel) * 0.1) * (1 - achata);
+    return { x: 0.1 + 0.8 * Math.pow(f, 0.92), h: Math.max(0, h), sx: 1 + achata * forca - estica * 0.5, sy: 1 - achata * forca + estica };
   }
-  function perto(c, k) { return [c[0] + (FUNDO[0] - c[0]) * k, c[1] + (FUNDO[1] - c[1]) * k, c[2] + (FUNDO[2] - c[2]) * k]; }
-  function lerFundo() {
-    var v = getComputedStyle(painel).getPropertyValue('--marinho').trim(), m = /^#?([0-9a-f]{6})$/i.exec(v);
-    if (m) { var n = parseInt(m[1], 16); FUNDO = [n >> 16, (n >> 8) & 255, n & 255]; }
-  }
-  function rgba(c, a) { return 'rgba(' + (c[0] | 0) + ',' + (c[1] | 0) + ',' + (c[2] | 0) + ',' + a.toFixed(3) + ')'; }
 
-  // nó trifólio: as três esferas, a 120° umas das outras, sempre formam um triângulo
-  function no(u) { return [Math.sin(u) + 2 * Math.sin(2 * u), Math.cos(u) - 2 * Math.cos(2 * u), -1.15 * Math.sin(3 * u)]; }
-  function girar(p, ax, ay) {
-    var c = Math.cos(ax), s = Math.sin(ax), y = p[1] * c - p[2] * s, z = p[1] * s + p[2] * c;
-    var c2 = Math.cos(ay), s2 = Math.sin(ay);
-    return [p[0] * c2 + z * s2, y, -p[0] * s2 + z * c2];
-  }
-  function projetar(p, esc) { var k = 9 / (9 + p[2]); return { x: W / 2 + p[0] * esc * k, y: H / 2 + p[1] * esc * k, k: k, z: p[2] }; }
-
-  // ocupa o espaço livre abaixo do título, sem invadir o texto
-  var texto = painel.querySelector('h1') ? painel.querySelector('h1').parentNode : null;
-  function posicionar() {
-    if (!texto) return;
-    var pr = painel.getBoundingClientRect(), tb = texto.getBoundingClientRect();
-    var livre = pr.bottom - tb.bottom - 12 + 44;
-    cv.style.width = Math.round(Math.max(240, Math.min(pr.width * 0.78, livre))) + 'px';
-  }
   function medir() {
-    posicionar();
-    var r = cv.getBoundingClientRect();
-    dpr = Math.min(2, window.devicePixelRatio || 1);
+    var r = cv.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
     W = r.width; H = r.height;
     cv.width = Math.max(1, Math.round(W * dpr)); cv.height = Math.max(1, Math.round(H * dpr));
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
+  function bola(x, y, r, sx, sy, alfa, contorno) {
+    ctx.save();
+    ctx.translate(x, y + r * (1 - sy));             // apoia a base no chão ao achatar
+    ctx.scale(sx, sy);
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
+    if (contorno) { ctx.strokeStyle = 'rgba(246,239,233,' + alfa.toFixed(3) + ')'; ctx.lineWidth = 1.2 / Math.max(sx, sy); ctx.stroke(); }
+    else {
+      var g = ctx.createRadialGradient(r * 0.35, -r * 0.42, r * 0.05, 0, 0, r);
+      g.addColorStop(0, '#fbb467'); g.addColorStop(0.32, '#e4532a'); g.addColorStop(0.74, '#a3172d'); g.addColorStop(1, '#4e0814');
+      ctx.globalAlpha = alfa; ctx.fillStyle = g; ctx.fill();
+    }
+    ctx.restore();
+  }
+
   function desenhar() {
     if (!W || !H) return;
     ctx.clearRect(0, 0, W, H);
-    var esc = Math.min(W, H) / 7.3;
-    var ax = 0.42 + incl.y + 0.12 * Math.sin(relogio * 0.27);
-    var ay = relogio * 0.1 + incl.x;
+    var linhaTempo = H - 58, chao = linhaTempo - 30, topo = 14, r = Math.max(12, Math.min(W, H) * 0.078);
+    var alcance = chao - topo - 2 * r, f = t / DUR;
+    var X = function (e) { return e.x * W; }, Y = function (e) { return chao - r - e.h * alcance; };
 
-    // guia: o caminho inteiro, bem fraco, como um traçado técnico
+    // trajetória completa, pontilhada
     ctx.beginPath();
-    for (var g = 0; g <= 240; g++) {
-      var pg = projetar(girar(no(g / 240 * Math.PI * 2), ax, ay), esc);
-      g ? ctx.lineTo(pg.x, pg.y) : ctx.moveTo(pg.x, pg.y);
-    }
-    ctx.setLineDash([1.5, 7]); ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(246,239,233,0.10)'; ctx.stroke(); ctx.setLineDash([]);
+    for (var i = 0; i <= 160; i++) { var e0 = estado(i / 160); i ? ctx.lineTo(X(e0), Y(e0)) : ctx.moveTo(X(e0), Y(e0)); }
+    ctx.setLineDash([1.5, 6]); ctx.strokeStyle = 'rgba(246,239,233,0.16)'; ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]);
 
-    var pecas = [];
-    for (var e = 0; e < 3; e++) {
-      var base = fase + e * TRES, pts = [];
-      for (var i = 0; i <= PASSOS; i++) {
-        var u = base - i / PASSOS * RASTRO;
-        pts.push({ p: projetar(girar(no(u), ax, ay), esc), u: u });
-      }
-      for (i = 0; i < PASSOS; i++) {
-        var a = pts[i].p, b = pts[i + 1].p;
-        var dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1, nx = -dy / len, ny = dx / len;
-        var cauda = i / PASSOS, largura = esc * 0.4 * Math.pow(1 - cauda, 0.7);
-        var torcao = Math.cos(pts[i].u * 1.5 + e * 2.1);                 // a fita gira em torno de si
-        var wa = largura * a.k * (0.28 + 0.72 * Math.abs(torcao)), wb = wa * (1 - 1 / PASSOS);
-        var cor = torcao >= 0 ? mistura(FRENTE, cauda * 1.1 + 0.05) : mistura(VERSO, cauda);
-        var luz = 0.55 + 0.45 * Math.abs(torcao);
-        pecas.push({
-          z: (a.z + b.z) / 2, tipo: 0, verso: torcao < 0, borda: rgba(torcao < 0 ? [236, 106, 36] : [255, 206, 150], (torcao < 0 ? 0.75 : 0.5) * Math.pow(1 - cauda, 1.4) * Math.abs(torcao)), q: [a.x + nx * wa, a.y + ny * wa, b.x + nx * wb, b.y + ny * wb, b.x - nx * wb, b.y - ny * wb, a.x - nx * wa, a.y - ny * wa],
-          cor: rgba(perto([cor[0] * luz, cor[1] * luz, cor[2] * luz], Math.pow(cauda, 1.6) * 0.95), 1)
-        });
-      }
-      var cab = pts[0].p;
-      pecas.push({ z: cab.z - 0.35, tipo: 1, x: cab.x, y: cab.y, r: esc * 0.58 * cab.k });
-    }
-    pecas.sort(function (m, n) { return n.z - m.z; });   // do fundo para a frente
+    // chão
+    ctx.beginPath(); ctx.moveTo(W * 0.04, chao); ctx.lineTo(W * 0.96, chao); ctx.strokeStyle = 'rgba(246,239,233,0.22)'; ctx.stroke();
 
-    for (var j = 0; j < pecas.length; j++) {
-      var o = pecas[j];
-      if (o.tipo === 0) {
-        ctx.beginPath(); ctx.moveTo(o.q[0], o.q[1]); ctx.lineTo(o.q[2], o.q[3]); ctx.lineTo(o.q[4], o.q[5]); ctx.lineTo(o.q[6], o.q[7]); ctx.closePath();
-        ctx.fillStyle = o.cor; ctx.fill(); ctx.strokeStyle = o.cor; ctx.lineWidth = 1.1; ctx.lineJoin = 'round'; ctx.stroke();
-        // contorno: brilho laranja na borda da face grafite, reflexo claro na face laranja
-        ctx.beginPath(); ctx.moveTo(o.q[0], o.q[1]); ctx.lineTo(o.q[2], o.q[3]);
-        if (o.verso) { ctx.moveTo(o.q[4], o.q[5]); ctx.lineTo(o.q[6], o.q[7]); }
-        ctx.strokeStyle = o.borda; ctx.lineWidth = 1.4; ctx.stroke();
-      } else {
-        var gr = ctx.createRadialGradient(o.x + o.r * 0.34, o.y - o.r * 0.42, o.r * 0.05, o.x, o.y, o.r);
-        gr.addColorStop(0, '#fbb467'); gr.addColorStop(0.3, '#e4532a'); gr.addColorStop(0.72, '#a3172d'); gr.addColorStop(1, '#4e0814');
-        ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2); ctx.fillStyle = gr; ctx.fill();
-        ctx.beginPath(); ctx.arc(o.x, o.y, o.r + 3, 0, Math.PI * 2); ctx.strokeStyle = rgba(FUNDO, 0.9); ctx.lineWidth = Math.max(2, o.r * 0.12); ctx.stroke();
-      }
+    var e = estado(f), sumir = Math.min(1, f / 0.03, (1 - f) / 0.06);
+    // sombra no chão
+    var s = 1 - e.h * 0.75;
+    ctx.beginPath(); ctx.ellipse(X(e), chao + 1, r * 1.1 * s * e.sx, r * 0.22 * s, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,' + (0.45 * s * sumir).toFixed(3) + ')'; ctx.fill();
+
+    // rastro dos quadros anteriores (onion skin)
+    for (var k = 7; k >= 1; k--) {
+      var fk = f - k * (1 / QUADROS) * 0.9;
+      if (fk < 0) continue;
+      var ek = estado(fk);
+      bola(X(ek), Y(ek), r, ek.sx, ek.sy, 0.42 * (1 - k / 8) * sumir, true);
     }
+    bola(X(e), Y(e), r, e.sx, e.sy, sumir, false);
+
+    // linha do tempo
+    var x0 = W * 0.06, x1 = W * 0.94, ly = linhaTempo + 14;
+    ctx.fillStyle = 'rgba(246,239,233,0.06)'; ctx.fillRect(x0, ly - 11, x1 - x0, 22);
+    for (var q = 0; q <= QUADROS; q++) {
+      var qx = x0 + (x1 - x0) * q / QUADROS, alto = q % 6 === 0;
+      ctx.beginPath(); ctx.moveTo(qx, ly + 11); ctx.lineTo(qx, ly + 11 - (alto ? 8 : 4));
+      ctx.strokeStyle = 'rgba(246,239,233,' + (alto ? 0.35 : 0.16) + ')'; ctx.stroke();
+    }
+    chaves.forEach(function (c) {                    // quadros-chave: topos e impactos
+      var cx = x0 + (x1 - x0) * c, lado = 4.5;
+      ctx.beginPath(); ctx.moveTo(cx, ly - lado - 1); ctx.lineTo(cx + lado, ly - 1); ctx.lineTo(cx, ly + lado - 1); ctx.lineTo(cx - lado, ly - 1); ctx.closePath();
+      ctx.fillStyle = f >= c - 0.004 ? '#ec6a24' : 'rgba(236,106,36,0.35)'; ctx.fill();
+    });
+    var px = x0 + (x1 - x0) * f;                     // cursor
+    ctx.beginPath(); ctx.moveTo(px, ly - 16); ctx.lineTo(px, ly + 12); ctx.strokeStyle = '#f6efe9'; ctx.lineWidth = 1.5; ctx.stroke(); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(px - 5, ly - 21); ctx.lineTo(px + 5, ly - 21); ctx.lineTo(px, ly - 15); ctx.closePath(); ctx.fillStyle = '#f6efe9'; ctx.fill();
+
+    ctx.font = '500 11px "JetBrains Mono", ui-monospace, monospace'; ctx.fillStyle = 'rgba(246,239,233,0.62)';
+    ctx.textAlign = 'left'; ctx.fillText('quadro ' + String(Math.min(QUADROS, Math.round(f * QUADROS))).padStart(2, '0') + ' / ' + QUADROS, x0, ly + 32);
+    ctx.textAlign = 'right'; ctx.fillText(arrastando ? 'arrastando' : '24 qps · ease-in / ease-out', x1, ly + 32);
   }
 
   function quadro(agora) {
     if (!rodando) return;
     var dt = Math.min(0.05, (agora - (ultimo || agora)) / 1000); ultimo = agora;
-    relogio += dt;
-    var ciclo = (relogio % 7.5) / 7.5;                         // a cada 7,5 s quase para (pose do logo)
-    var vel = 0.08 + 0.92 * Math.pow(Math.sin(Math.PI * ciclo), 2);
-    fase += dt * (0.62 * vel + impulso);
-    impulso *= Math.exp(-dt * 1.8);
-    incl.x += (alvo.x - incl.x) * Math.min(1, dt * 3.5);
-    incl.y += (alvo.y - incl.y) * Math.min(1, dt * 3.5);
+    if (!arrastando) { t += dt; if (t > DUR + 0.5) t = 0; }
     desenhar();
     requestAnimationFrame(quadro);
   }
   function ligar() { if (rodando || REDUZIR || !visivel) return; rodando = true; ultimo = 0; requestAnimationFrame(quadro); }
   function desligar() { rodando = false; }
 
-  painel.addEventListener('pointermove', function (ev) {
-    var r = painel.getBoundingClientRect();
-    alvo.x = ((ev.clientX - r.left) / r.width - 0.5) * 0.9;
-    alvo.y = ((ev.clientY - r.top) / r.height - 0.5) * 0.6;
-  });
-  painel.addEventListener('pointerleave', function () { alvo.x = 0; alvo.y = 0; });
-  cv.addEventListener('click', function () { if (!REDUZIR) impulso = Math.min(impulso + 3.2, 6); });
+  // arrastar na linha do tempo (ou em qualquer ponto da cena) controla o quadro
+  function irPara(ev) {
+    var r = cv.getBoundingClientRect(), x0 = r.width * 0.06, x1 = r.width * 0.94;
+    t = Math.max(0, Math.min(1, (ev.clientX - r.left - x0) / (x1 - x0))) * DUR;
+    desenhar();
+  }
+  cv.addEventListener('pointerdown', function (ev) { arrastando = true; cv.setPointerCapture(ev.pointerId); irPara(ev); });
+  cv.addEventListener('pointermove', function (ev) { if (arrastando) irPara(ev); });
+  ['pointerup', 'pointercancel'].forEach(function (n) { cv.addEventListener(n, function () { arrastando = false; desenhar(); }); });
 
-  new ResizeObserver(function () { medir(); desenhar(); }).observe(painel);
+  new ResizeObserver(function () { medir(); desenhar(); }).observe(cv);
   new IntersectionObserver(function (es) { visivel = es[0].isIntersecting; visivel ? ligar() : desligar(); }).observe(cv);
   document.addEventListener('visibilitychange', function () { document.hidden ? desligar() : ligar(); });
-  lerFundo(); medir(); desenhar();
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () { lerFundo(); desenhar(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(desenhar);
+  medir(); desenhar();
 })();
 </script>
 </body>
