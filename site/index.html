@@ -255,8 +255,9 @@
   .entrada-marca { justify-content: flex-start; gap: 0; }
   .entrada-marca > div:not(.cena-box) { margin-top: clamp(20px, 5vh, 56px); }
   .cena-box { flex: 1; min-height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding-top: 24px; }
-  .quique { width: min(100%, 640px, calc((100vh - 480px) * 1.5)); aspect-ratio: 3 / 2; display: block; cursor: grab; touch-action: none; }
-  .quique:active { cursor: grabbing; }
+  .entrada-marca > :not(.particulas) { position: relative; z-index: 1; }
+  .particulas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; pointer-events: none; }
+  .cena-area { flex: 1; width: 100%; min-height: 200px; }
   .cena-legenda { text-align: center; font: 400 11.5px var(--mono); color: var(--marinho-suave); letter-spacing: .02em; }
 
   .entrada-painel { display: grid; place-items: center; padding: 40px 20px; }
@@ -333,7 +334,7 @@
   @media (max-width: 820px) {
     .entrada { grid-template-columns: 1fr; min-height: 0; }
     .entrada-marca { padding: 28px 20px 32px; gap: 16px; }
-    .cena-box { display: none; }
+    .cena-box, .particulas { display: none; }
     .entrada-painel { padding: 24px 16px 48px; }
     .entrada-cartao { padding: 24px 20px; }
     .sessao { flex-wrap: wrap; }
@@ -349,14 +350,15 @@
 <body>
 <section class="entrada" id="entrada" aria-labelledby="entrada-titulo">
   <div class="entrada-marca">
+    <canvas class="particulas" id="particulas" aria-hidden="true"></canvas>
     <span class="marca"><span class="marca-simbolo" role="img" aria-label="Logo animasys"></span><span class="marca-nome">animasys</span></span>
     <div>
       <h1>Animações prontas para <span class="grad">levar.</span></h1>
       <p>Entre para ver as animações de cada app rodando e copiar o código.</p>
     </div>
     <div class="cena-box" aria-hidden="true">
-      <canvas class="quique" id="quique"></canvas>
-      <span class="cena-legenda">bola quicando · arraste a linha do tempo</span>
+      <div class="cena-area" id="cena-area"></div>
+      <span class="cena-legenda">passe o mouse para mexer nas partículas</span>
     </div>
   </div>
   <div class="entrada-painel">
@@ -1484,44 +1486,68 @@
 })();
 </script>
 <script>
-/* Bola quicando: o exercício clássico de animação, com a esfera do logo.
-   Achata no impacto, estica na queda, deixa o rastro dos quadros anteriores
-   e roda sobre uma linha do tempo de 48 quadros que dá para arrastar. */
+/* Partículas do login: milhares de pontos formam o logo, explodem e se juntam de novo
+   numa forma diferente a cada ciclo: logo → "animasys" → play → </> → logo…
+   O mouse empurra as partículas. Para quando a tela de login some ou a aba fica oculta. */
 (function () {
-  var cv = document.getElementById('quique');
+  var cv = document.getElementById('particulas');
   if (!cv || !cv.getContext) return;
   var ctx = cv.getContext('2d');
   var REDUZIR = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var W = 0, H = 0, rodando = false, visivel = false, ultimo = 0, arrastando = false;
-  var DUR = 3.6, QUADROS = 48, t = REDUZIR ? 1.15 : 0;
+  var TOTAL = 2400, CICLO = 6800, AW = 300, AH = 200;          // amostragem numa área 3:2
+  var W = 0, H = 0, formas = [], parts = [], mouse = { x: -1e4, y: -1e4 }, area = { x: 0, y: 0, w: 0, h: 0 };
+  var caixa = document.getElementById('cena-area');
+  var inicio = 0, rodando = false, visivel = false, pronto = false;
 
-  // alturas de cada trecho (0 a 1) e duração proporcional à raiz da altura, como na física
-  var ARCOS = [{ h: 1, d: 1, queda: true }, { h: 0.52, d: 2 * Math.sqrt(0.52) }, { h: 0.24, d: 2 * Math.sqrt(0.24) }, { h: 0.08, d: 2 * Math.sqrt(0.08) }];
-  var ROLAR = 0.55, TOTAL = ARCOS.reduce(function (s, a) { return s + a.d; }, 0) + ROLAR;
-  var impactos = [], chaves = [], acc = 0;
-  chaves.push(0);
-  ARCOS.forEach(function (a, i) { if (!a.queda) chaves.push((acc + a.d / 2) / TOTAL); acc += a.d; impactos.push(acc / TOTAL); chaves.push(acc / TOTAL); });
-  chaves.push(1);
-
-  // estado da bola num instante (0..1 do ciclo)
-  function estado(f) {
-    var u = f * TOTAL, a0 = 0, h = 0, vel = 0;
-    for (var i = 0; i < ARCOS.length; i++) {
-      var a = ARCOS[i];
-      if (u <= a0 + a.d) {
-        var x = u - a0;
-        if (a.queda) { h = 1 - x * x; vel = -2 * x; }
-        else { var m = a.d / 2, k = (x - m) / m; h = a.h * (1 - k * k); vel = -2 * a.h * k / m; }
-        break;
-      }
-      a0 += a.d;
+  function escurecido(r, g, b) {                                // preto do logo vira grafite, senão some no fundo
+    if (Math.max(r, g, b) < 80) return [92 + r * .4, 82 + g * .4, 78 + b * .4];
+    return [r, g, b];
+  }
+  function amostrar(desenhar) {
+    var c = document.createElement('canvas'); c.width = AW; c.height = AH;
+    var x = c.getContext('2d'); desenhar(x);
+    var d = x.getImageData(0, 0, AW, AH).data, pts = [];
+    for (var y = 0; y < AH; y += 2) for (var xx = 0; xx < AW; xx += 2) {
+      var k = (y * AW + xx) * 4;
+      if (d[k + 3] > 140) pts.push({ u: xx / AW - .5, v: y / AH - .5, c: escurecido(d[k], d[k + 1], d[k + 2]) });
     }
-    // achatamento perto de cada impacto
-    var achata = 0;
-    impactos.forEach(function (p) { var dd = Math.abs(f - p) * TOTAL; if (dd < 0.07) achata = Math.max(achata, 1 - dd / 0.07); });
-    var forca = impactos.reduce(function (s, p, j) { return Math.abs(f - p) * TOTAL < 0.07 ? [0.34, 0.24, 0.14, 0.06][j] : s; }, 0);
-    var estica = Math.min(0.22, Math.abs(vel) * 0.1) * (1 - achata);
-    return { x: 0.1 + 0.8 * Math.pow(f, 0.92), h: Math.max(0, h), sx: 1 + achata * forca - estica * 0.5, sy: 1 - achata * forca + estica };
+    // sempre TOTAL pontos: embaralha e repete/corta
+    for (var i = pts.length - 1; i > 0; i--) { var j = Math.random() * (i + 1) | 0, t = pts[i]; pts[i] = pts[j]; pts[j] = t; }
+    var saida = [];
+    for (i = 0; i < TOTAL; i++) saida.push(pts[i % Math.max(1, pts.length)]);
+    return saida;
+  }
+  function degrade(x, x0, x1) {
+    var g = x.createLinearGradient(x0, 0, x1, 0);
+    g.addColorStop(0, '#f6a24a'); g.addColorStop(.45, '#ec6a24'); g.addColorStop(1, '#c9272c');
+    return g;
+  }
+  function criarFormas(logo) {
+    formas = [
+      amostrar(function (x) { var l = AH * .96; x.drawImage(logo, (AW - l) / 2, (AH - l) / 2, l, l); }),
+      amostrar(function (x) {
+        var tam = 70;
+        x.font = '800 ' + tam + 'px "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif';
+        var larg = x.measureText('animasys').width;
+        if (larg > AW * .94) { tam = Math.floor(tam * AW * .94 / larg); x.font = '800 ' + tam + 'px "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif'; }   // sempre cabe
+        x.textBaseline = 'middle';
+        var a = x.measureText('anima').width, s = x.measureText('sys').width, x0 = (AW - a - s) / 2;
+        x.fillStyle = '#f6efe9'; x.fillText('anima', x0, AH / 2);
+        x.fillStyle = degrade(x, x0 + a, x0 + a + s); x.fillText('sys', x0 + a, AH / 2);
+      }),
+      amostrar(function (x) {
+        var cx = AW / 2, cy = AH / 2, r = AH * .42;
+        x.lineWidth = 10; x.strokeStyle = degrade(x, cx - r, cx + r);
+        x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.stroke();
+        x.fillStyle = '#f6efe9';
+        x.beginPath(); x.moveTo(cx - r * .32, cy - r * .48); x.lineTo(cx + r * .5, cy); x.lineTo(cx - r * .32, cy + r * .48); x.closePath(); x.fill();
+      }),
+      amostrar(function (x) {
+        x.font = '500 104px "JetBrains Mono", ui-monospace, monospace';
+        x.textAlign = 'center'; x.textBaseline = 'middle';
+        x.fillStyle = degrade(x, AW * .2, AW * .8); x.fillText('</>', AW / 2, AH / 2 + 4);
+      })
+    ];
   }
 
   function medir() {
@@ -1529,99 +1555,73 @@
     W = r.width; H = r.height;
     cv.width = Math.max(1, Math.round(W * dpr)); cv.height = Math.max(1, Math.round(H * dpr));
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var a = caixa ? caixa.getBoundingClientRect() : r;
+    area = { x: a.left - r.left, y: a.top - r.top, w: a.width, h: a.height };
+  }
+  function alvo(p) {
+    var lado = Math.min(area.w, area.h * AW / AH, 640) * .96;
+    return { x: area.x + area.w / 2 + p.u * lado, y: area.y + area.h / 2 + p.v * lado * AH / AW };
   }
 
-  function bola(x, y, r, sx, sy, alfa, contorno) {
-    ctx.save();
-    ctx.translate(x, y + r * (1 - sy));             // apoia a base no chão ao achatar
-    ctx.scale(sx, sy);
-    ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
-    if (contorno) { ctx.strokeStyle = 'rgba(246,239,233,' + alfa.toFixed(3) + ')'; ctx.lineWidth = 1.2 / Math.max(sx, sy); ctx.stroke(); }
-    else {
-      var g = ctx.createRadialGradient(r * 0.35, -r * 0.42, r * 0.05, 0, 0, r);
-      g.addColorStop(0, '#fbb467'); g.addColorStop(0.32, '#e4532a'); g.addColorStop(0.74, '#a3172d'); g.addColorStop(1, '#4e0814');
-      ctx.globalAlpha = alfa; ctx.fillStyle = g; ctx.fill();
-    }
-    ctx.restore();
-  }
-
-  function desenhar() {
-    if (!W || !H) return;
-    ctx.clearRect(0, 0, W, H);
-    var linhaTempo = H - 58, chao = linhaTempo - 30, topo = 14, r = Math.max(12, Math.min(W, H) * 0.078);
-    var alcance = chao - topo - 2 * r, f = t / DUR;
-    var X = function (e) { return e.x * W; }, Y = function (e) { return chao - r - e.h * alcance; };
-
-    // trajetória completa, pontilhada
-    ctx.beginPath();
-    for (var i = 0; i <= 160; i++) { var e0 = estado(i / 160); i ? ctx.lineTo(X(e0), Y(e0)) : ctx.moveTo(X(e0), Y(e0)); }
-    ctx.setLineDash([1.5, 6]); ctx.strokeStyle = 'rgba(246,239,233,0.16)'; ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]);
-
-    // chão
-    ctx.beginPath(); ctx.moveTo(W * 0.04, chao); ctx.lineTo(W * 0.96, chao); ctx.strokeStyle = 'rgba(246,239,233,0.22)'; ctx.stroke();
-
-    var e = estado(f), sumir = Math.min(1, f / 0.03, (1 - f) / 0.06);
-    // sombra no chão
-    var s = 1 - e.h * 0.75;
-    ctx.beginPath(); ctx.ellipse(X(e), chao + 1, r * 1.1 * s * e.sx, r * 0.22 * s, 0, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(0,0,0,' + (0.45 * s * sumir).toFixed(3) + ')'; ctx.fill();
-
-    // rastro dos quadros anteriores (onion skin)
-    for (var k = 7; k >= 1; k--) {
-      var fk = f - k * (1 / QUADROS) * 0.9;
-      if (fk < 0) continue;
-      var ek = estado(fk);
-      bola(X(ek), Y(ek), r, ek.sx, ek.sy, 0.42 * (1 - k / 8) * sumir, true);
-    }
-    bola(X(e), Y(e), r, e.sx, e.sy, sumir, false);
-
-    // linha do tempo
-    var x0 = W * 0.06, x1 = W * 0.94, ly = linhaTempo + 14;
-    ctx.fillStyle = 'rgba(246,239,233,0.06)'; ctx.fillRect(x0, ly - 11, x1 - x0, 22);
-    for (var q = 0; q <= QUADROS; q++) {
-      var qx = x0 + (x1 - x0) * q / QUADROS, alto = q % 6 === 0;
-      ctx.beginPath(); ctx.moveTo(qx, ly + 11); ctx.lineTo(qx, ly + 11 - (alto ? 8 : 4));
-      ctx.strokeStyle = 'rgba(246,239,233,' + (alto ? 0.35 : 0.16) + ')'; ctx.stroke();
-    }
-    chaves.forEach(function (c) {                    // quadros-chave: topos e impactos
-      var cx = x0 + (x1 - x0) * c, lado = 4.5;
-      ctx.beginPath(); ctx.moveTo(cx, ly - lado - 1); ctx.lineTo(cx + lado, ly - 1); ctx.lineTo(cx, ly + lado - 1); ctx.lineTo(cx - lado, ly - 1); ctx.closePath();
-      ctx.fillStyle = f >= c - 0.004 ? '#ec6a24' : 'rgba(236,106,36,0.35)'; ctx.fill();
+  function nascer() {
+    parts = formas[0].map(function (p) {
+      var a = Math.random() * Math.PI * 2, r = Math.max(W, H) * (.6 + Math.random() * .4);
+      return { x: area.x + area.w / 2 + Math.cos(a) * r, y: area.y + area.h / 2 + Math.sin(a) * r, vx: 0, vy: 0, c: p.c.slice(), atraso: Math.random(), giro: (Math.random() - .5) * 2 };
     });
-    var px = x0 + (x1 - x0) * f;                     // cursor
-    ctx.beginPath(); ctx.moveTo(px, ly - 16); ctx.lineTo(px, ly + 12); ctx.strokeStyle = '#f6efe9'; ctx.lineWidth = 1.5; ctx.stroke(); ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(px - 5, ly - 21); ctx.lineTo(px + 5, ly - 21); ctx.lineTo(px, ly - 15); ctx.closePath(); ctx.fillStyle = '#f6efe9'; ctx.fill();
-
-    ctx.font = '500 11px "JetBrains Mono", ui-monospace, monospace'; ctx.fillStyle = 'rgba(246,239,233,0.62)';
-    ctx.textAlign = 'left'; ctx.fillText('quadro ' + String(Math.min(QUADROS, Math.round(f * QUADROS))).padStart(2, '0') + ' / ' + QUADROS, x0, ly + 32);
-    ctx.textAlign = 'right'; ctx.fillText(arrastando ? 'arrastando' : '24 qps · ease-in / ease-out', x1, ly + 32);
   }
 
   function quadro(agora) {
     if (!rodando) return;
-    var dt = Math.min(0.05, (agora - (ultimo || agora)) / 1000); ultimo = agora;
-    if (!arrastando) { t += dt; if (t > DUR + 0.5) t = 0; }
-    desenhar();
+    if (!inicio) inicio = agora;
+    var decorrido = agora - inicio, volta = Math.floor(decorrido / CICLO), f = (decorrido % CICLO) / CICLO;
+    var forma = formas[volta % formas.length];
+    ctx.clearRect(0, 0, W, H);
+    for (var i = 0; i < parts.length; i++) {
+      var p = parts[i], dest = forma[i], a = alvo(dest);
+      if (f < .72) {                                             // juntar e segurar: mola até o ponto da forma
+        var k = f < .02 + p.atraso * .05 ? .006 : .042;
+        p.vx = (p.vx + (a.x - p.x) * k) * .84; p.vy = (p.vy + (a.y - p.y) * k) * .84;
+        for (var c = 0; c < 3; c++) p.c[c] += (dest.c[c] - p.c[c]) * .06;   // a cor vai virando a da forma nova
+      } else {                                                   // explodir: redemoinho para fora
+        var ox = area.x + area.w / 2, oy = area.y + area.h / 2;
+        var dx = p.x - ox, dy = p.y - oy, d = Math.hypot(dx, dy) || 1, forca = f < .745 ? .75 : .05;
+        p.vx += (dx / d) * forca + (-dy / d) * .16 * p.giro; p.vy += (dy / d) * forca + (dx / d) * .16 * p.giro;
+        p.vx *= .955; p.vy *= .955;
+      }
+      var mx = p.x - mouse.x, my = p.y - mouse.y, md = mx * mx + my * my;
+      if (md < 5200) { var fm = (5200 - md) / 5200 * 2.4, dm = Math.sqrt(md) || 1; p.vx += mx / dm * fm; p.vy += my / dm * fm; }
+      p.x += p.vx; p.y += p.vy;
+      ctx.fillStyle = 'rgb(' + (p.c[0] | 0) + ',' + (p.c[1] | 0) + ',' + (p.c[2] | 0) + ')';
+      ctx.fillRect(p.x - 1.1, p.y - 1.1, 2.2, 2.2);
+    }
     requestAnimationFrame(quadro);
   }
-  function ligar() { if (rodando || REDUZIR || !visivel) return; rodando = true; ultimo = 0; requestAnimationFrame(quadro); }
+  function parado() {                                           // "reduzir movimento": só o logo montado
+    ctx.clearRect(0, 0, W, H);
+    formas[0].forEach(function (p) { var a = alvo(p); ctx.fillStyle = 'rgb(' + (p.c[0] | 0) + ',' + (p.c[1] | 0) + ',' + (p.c[2] | 0) + ')'; ctx.fillRect(a.x - 1.1, a.y - 1.1, 2.2, 2.2); });
+  }
+  function ligar() {
+    if (!pronto || !visivel || rodando) return;
+    if (REDUZIR) { parado(); return; }
+    rodando = true; requestAnimationFrame(quadro);
+  }
   function desligar() { rodando = false; }
 
-  // arrastar na linha do tempo (ou em qualquer ponto da cena) controla o quadro
-  function irPara(ev) {
-    var r = cv.getBoundingClientRect(), x0 = r.width * 0.06, x1 = r.width * 0.94;
-    t = Math.max(0, Math.min(1, (ev.clientX - r.left - x0) / (x1 - x0))) * DUR;
-    desenhar();
-  }
-  cv.addEventListener('pointerdown', function (ev) { arrastando = true; cv.setPointerCapture(ev.pointerId); irPara(ev); });
-  cv.addEventListener('pointermove', function (ev) { if (arrastando) irPara(ev); });
-  ['pointerup', 'pointercancel'].forEach(function (n) { cv.addEventListener(n, function () { arrastando = false; desenhar(); }); });
-
-  new ResizeObserver(function () { medir(); desenhar(); }).observe(cv);
+  var painel = cv.closest('.entrada-marca') || cv;
+  painel.addEventListener('pointermove', function (e) { var r = cv.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; });
+  painel.addEventListener('pointerleave', function () { mouse.x = mouse.y = -1e4; });
+  new ResizeObserver(function () { medir(); if (REDUZIR && pronto) parado(); }).observe(painel);
   new IntersectionObserver(function (es) { visivel = es[0].isIntersecting; visivel ? ligar() : desligar(); }).observe(cv);
-  document.addEventListener('visibilitychange', function () { document.hidden ? desligar() : ligar(); });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(desenhar);
-  medir(); desenhar();
+  document.addEventListener('visibilitychange', function () { if (document.hidden) { desligar(); } else { inicio = 0; ligar(); } });
+
+  var logo = new Image();
+  logo.src = 'logo-animasys.webp';
+  var fontes = document.fonts ? Promise.all([
+    document.fonts.load('800 70px "Bricolage Grotesque"'), document.fonts.load('500 104px "JetBrains Mono"')
+  ]).catch(function () {}) : Promise.resolve();
+  Promise.all([fontes, new Promise(function (ok) { logo.onload = ok; logo.onerror = ok; })]).then(function () {
+    medir(); criarFormas(logo); nascer(); pronto = true; ligar();
+  });
 })();
 </script>
 </body>
