@@ -263,3 +263,15 @@ begin
   begin alter publication supabase_realtime add table public.sistemas; exception when duplicate_object then null; end;
   begin alter publication supabase_realtime add table public.perfis; exception when duplicate_object then null; end;
 end $$;
+
+-- ------------------------------------------------------------------
+-- Funções internas fora da API
+-- ------------------------------------------------------------------
+
+revoke execute on function public.ao_criar_usuario() from public, anon, authenticated;
+revoke execute on function public.ao_confirmar_usuario() from public, anon, authenticated;
+revoke execute on function public.ao_decidir() from public, anon, authenticated;
+revoke execute on function public.eh_admin() from public, anon;
+revoke execute on function public.eh_liberado() from public, anon;
+grant execute on function public.eh_admin() to authenticated;
+grant execute on function public.eh_liberado() to authenticated;
