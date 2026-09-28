@@ -57,7 +57,7 @@ $$;
 -- ------------------------------------------------------------------
 
 create or replace function public.esc(t text) returns text
-language sql immutable as $$
+language sql immutable set search_path = public as $$
   select replace(replace(replace(replace(coalesce(t, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;'), '"', '&quot;');
 $$;
 
@@ -181,7 +181,7 @@ create trigger animasys_ao_decidir after update of status on public.perfis
 
 -- O admin não pode mexer no próprio papel nem se tirar do ar sem querer.
 create or replace function public.proteger_perfil() returns trigger
-language plpgsql as $$
+language plpgsql set search_path = public as $$
 begin
   if new.id <> old.id or new.email <> old.email or new.criado_em <> old.criado_em then
     raise exception 'Esses campos não podem ser alterados.';
@@ -202,7 +202,7 @@ create trigger animasys_proteger_perfil before update on public.perfis
 
 -- Carimbo de alteração
 create or replace function public.carimbar() returns trigger
-language plpgsql as $$
+language plpgsql set search_path = public as $$
 begin
   new.atualizado_em := now();
   return new;
