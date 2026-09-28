@@ -1,0 +1,98 @@
+/* Tema de Páscoa — IPC Comercial (cópia local)
+ * Ativado pela classe body.ipc-pascoa (colocada pelo pascoa.js).
+ * Para desligar: ATIVO = false no pascoa.js (ou remova as duas linhas no index.html). */
+
+/* A bolinha do "i" some: quem vira o pingo é o ovo que o coelho bota. */
+body.ipc-pascoa .ipc-logo-ball {
+  visibility: hidden;
+  animation: none;
+}
+
+/* ---------- Ovo (mesma caixa da bolinha do logo) ---------- */
+.ipc-pascoa-ovo {
+  position: absolute;
+  left: 24.39%;
+  top: 2.22%;
+  width: 7.8%;
+  aspect-ratio: 1;
+  transform-origin: 50% 100%;
+  pointer-events: none;
+}
+.ipc-pascoa-ovo svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* ---------- Coelho ---------- */
+.ipc-pascoa-coelho {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.ipc-pascoa-coelho-corpo {
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 100%;
+}
+.ipc-pascoa-coelho svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+/* Orelhas balançando enquanto pula */
+.ipc-pascoa-coelho .orelha {
+  transform-box: fill-box;
+  transform-origin: 50% 95%;
+  animation: ipc-pascoa-orelha .65s ease-in-out infinite alternate;
+}
+.ipc-pascoa-coelho .orelha-2 { animation-delay: -.32s; }
+@keyframes ipc-pascoa-orelha {
+  from { transform: rotate(-9deg); }
+  to   { transform: rotate(7deg); }
+}
+/* Rabinho mexendo na hora de botar o ovo */
+.ipc-pascoa-coelho .rabo {
+  transform-box: fill-box;
+  transform-origin: 80% 50%;
+}
+.ipc-pascoa-coelho.botando .rabo {
+  animation: ipc-pascoa-rabo .16s ease-in-out 8 alternate;
+}
+/* O ovo rosa sai da cesta (é ele que vira o pingo do "i") */
+.ipc-pascoa-coelho .ovo-cesta {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform .4s ease-in, opacity .4s ease-in;
+}
+.ipc-pascoa-coelho.sem-ovo .ovo-cesta {
+  transform: translateY(-3px) scale(0);
+  opacity: 0;
+}
+@keyframes ipc-pascoa-rabo {
+  from { transform: translateY(-.8px) rotate(-14deg); }
+  to   { transform: translateY(.8px) rotate(14deg); }
+}
+
+/* Brilhinhos quando o ovo aparece */
+.ipc-pascoa-brilho {
+  position: absolute;
+  margin: -4px 0 0 -4px;
+  font-size: 9px;
+  line-height: 1;
+  pointer-events: none;
+  animation: ipc-pascoa-brilho .8s ease-out 1 both;
+}
+@keyframes ipc-pascoa-brilho {
+  0%   { transform: translate(0, 0) scale(.3) rotate(0); opacity: 0; }
+  25%  { transform: translate(calc(var(--dx) * .35), calc(var(--dy) * .35)) scale(1.1) rotate(45deg); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(.3) rotate(140deg); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ipc-pascoa-coelho, .ipc-pascoa-brilho { display: none; }
+}

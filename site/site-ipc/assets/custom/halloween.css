@@ -1,0 +1,149 @@
+/* Tema de Halloween — IPC Comercial (cópia local)
+ * Ativado pela classe body.ipc-halloween (colocada pelo halloween.js).
+ * Para desligar depois do Halloween: remova as linhas do halloween.css e
+ * halloween.js no index.html (ou troque ATIVO para false no JS). */
+
+/* ---------- 1. Abóbora no lugar da bolinha do logo ---------- */
+/* Mesmo tamanho e mesma animação de escada da bolinha; aqui ela também rola. */
+body.ipc-halloween .ipc-logo-ball {
+  background: none;
+  border-radius: 0;
+  overflow: visible;
+}
+body.ipc-halloween .ipc-logo-ball::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 4.4V2.7c0-.9.5-1.7 1.5-2.1' stroke='%23276b2b' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3Cellipse cx='5' cy='10' rx='4.3' ry='5.6' fill='%23d9480f' stroke='%23a8380a' stroke-width='.5'/%3E%3Cellipse cx='11' cy='10' rx='4.3' ry='5.6' fill='%23d9480f' stroke='%23a8380a' stroke-width='.5'/%3E%3Cellipse cx='8' cy='10' rx='4.2' ry='5.9' fill='%23ff7b1c' stroke='%23a8380a' stroke-width='.5'/%3E%3Cpath d='M4.3 9h2.3L5.45 6.9zM9.4 9h2.3l-1.15-2.1zM4.2 11.2q3.8 3.4 7.6 0-1.4 1-2.4.7l-.6.7-.8-.7-.8.7-.6-.7q-1 .3-2.4-.7z' fill='%23231a10'/%3E%3C/svg%3E") center / contain no-repeat;
+  transform-origin: 50% 58%;
+  animation: ipc-abobora-rola 2.6s .6s 1 both;
+}
+/* Rola para a esquerda descendo a escada; no super impulso gira de volta. */
+@keyframes ipc-abobora-rola {
+  0%   { transform: rotate(0); }
+  21%  { transform: rotate(-120deg); }
+  40%  { transform: rotate(-240deg); }
+  59%  { transform: rotate(-360deg); }
+  70%  { transform: rotate(-360deg); animation-timing-function: cubic-bezier(.15, .9, .3, 1); }
+  93%  { transform: rotate(0); }
+  100% { transform: rotate(0); }
+}
+
+/* ---------- 2. Morcegos atravessando a faixa amarela ---------- */
+.ipc-hw-bats {
+  position: absolute;
+  left: 0;
+  z-index: 60;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ipc-bat {
+  position: absolute;
+  left: 0;
+  transform: translateX(calc(var(--ipc-lw) + 20px));
+  animation: ipc-bat-voa var(--dur) linear var(--delay) 1 both;
+}
+.ipc-bat-bob {
+  animation: ipc-bat-bob .9s ease-in-out infinite alternate;
+}
+.ipc-bat svg {
+  display: block;
+  width: var(--size);
+  height: auto;
+  fill: #15161a;
+}
+.ipc-bat .asa-e,
+.ipc-bat .asa-d {
+  transform-box: fill-box;
+  animation: ipc-asa-e .18s ease-in-out infinite alternate;
+}
+.ipc-bat .asa-e { transform-origin: 100% 40%; }
+.ipc-bat .asa-d { transform-origin: 0% 40%; animation-name: ipc-asa-d; }
+
+@keyframes ipc-bat-voa {
+  from { transform: translateX(calc(var(--ipc-lw) + 20px)); }
+  to   { transform: translateX(-90px); }
+}
+@keyframes ipc-bat-bob {
+  from { transform: translateY(-7px) rotate(-4deg); }
+  to   { transform: translateY(7px) rotate(4deg); }
+}
+@keyframes ipc-asa-e {
+  from { transform: rotate(20deg); }
+  to   { transform: rotate(-14deg) scaleY(.55); }
+}
+@keyframes ipc-asa-d {
+  from { transform: rotate(-20deg); }
+  to   { transform: rotate(14deg) scaleY(.55); }
+}
+
+/* ---------- 3. Aranha descendo pelo fio abaixo do menu ---------- */
+.ipc-hw-spider {
+  position: absolute;
+  z-index: 60;
+  width: 90px;
+  height: 150px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ipc-spider-sway {
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 0;
+  animation: ipc-aranha-balanca 2.2s ease-in-out 5s 1 both;
+}
+.ipc-spider-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(-145px);
+  animation: ipc-aranha-desce 5.2s 3.5s 1 both;
+}
+.ipc-spider-fio {
+  width: 1px;
+  height: 112px;
+  background: rgba(21, 22, 26, .55);
+}
+.ipc-spider-drop svg {
+  display: block;
+  width: 32px;
+  height: 30px;
+  margin-top: -6px;
+}
+.ipc-spider-drop .pernas-e,
+.ipc-spider-drop .pernas-d {
+  transform-box: fill-box;
+  animation: ipc-pernas .25s ease-in-out infinite alternate;
+}
+.ipc-spider-drop .pernas-e { transform-origin: 100% 40%; }
+.ipc-spider-drop .pernas-d { transform-origin: 0% 40%; animation-direction: alternate-reverse; }
+
+@keyframes ipc-aranha-desce {
+  0%   { transform: translateY(-145px); animation-timing-function: ease-in; }
+  17%  { transform: translateY(8px);    animation-timing-function: ease-out; }
+  23%  { transform: translateY(-10px);  animation-timing-function: ease-in-out; }
+  29%  { transform: translateY(0); }
+  68%  { transform: translateY(0);      animation-timing-function: ease-in; }
+  /* sobe de volta pelo fio, aos trancos */
+  76%  { transform: translateY(-40px); }
+  80%  { transform: translateY(-40px);  animation-timing-function: ease-in; }
+  90%  { transform: translateY(-95px); }
+  93%  { transform: translateY(-95px);  animation-timing-function: ease-in; }
+  100% { transform: translateY(-145px); }
+}
+@keyframes ipc-aranha-balanca {
+  0%   { transform: rotate(0); }
+  25%  { transform: rotate(8deg); }
+  55%  { transform: rotate(-6deg); }
+  80%  { transform: rotate(3deg); }
+  100% { transform: rotate(0); }
+}
+@keyframes ipc-pernas {
+  from { transform: rotate(-6deg); }
+  to   { transform: rotate(6deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.ipc-halloween .ipc-logo-ball::before { animation: none; }
+  .ipc-hw-bats, .ipc-hw-spider { display: none; }
+}

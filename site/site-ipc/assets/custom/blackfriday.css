@@ -1,0 +1,99 @@
+/* Tema de Black Friday — IPC Comercial (cópia local)
+ * Ativado pela classe body.ipc-bf (colocada pelo blackfriday.js).
+ * Para desligar: ATIVO = false no blackfriday.js (ou remova as duas linhas no index.html). */
+
+/* ---------- 1. Explosão preta e vermelha quando a bolinha do logo volta ---------- */
+.ipc-bf-burst {
+  position: absolute;
+  z-index: 60;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ipc-bf-p {
+  position: absolute;
+  font: 800 12px/1 Poppins, sans-serif;
+  opacity: 0;
+  animation: ipc-bf-confete 1.1s cubic-bezier(.15, .7, .35, 1) var(--d, 0s) 1 both;
+}
+/* Onda de choque vermelha no centro da explosão. */
+.ipc-bf-onda {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border: 3px solid #e03131;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: ipc-bf-onda .7s ease-out 0s 1 both;
+}
+@keyframes ipc-bf-onda {
+  0%   { transform: scale(.2); opacity: 0; }
+  10%  { opacity: 1; }
+  100% { transform: scale(4); opacity: 0; border-width: 1px; }
+}
+.ipc-bf-p.fita {
+  width: 7px;
+  height: 3px;
+  border-radius: 1px;
+}
+@keyframes ipc-bf-confete {
+  0%   { transform: translate(-50%, -50%) scale(.2) rotate(0); opacity: 1; }
+  55%  { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(var(--rot)); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--dx) * 1.15), calc(-50% + var(--dy) + 22px)) scale(.9) rotate(calc(var(--rot) * 1.6)); opacity: 0; }
+}
+
+/* ---------- 2. Etiquetas de desconto no estilo Black Friday ---------- */
+body.ipc-bf .label-promo {
+  background: #0b0b0d !important;
+  color: #ffd700 !important;
+  border: 1px solid #ffd700;
+  transform-origin: 50% -6px;
+  animation: ipc-bf-etiqueta 1.3s ease-out var(--d, .8s) 1 both;
+}
+body.ipc-bf .ipc-bf-off {
+  background: #0b0b0d !important;
+  color: #ffd700 !important;
+  display: inline-block;
+  transform-origin: 0 50%;
+  animation: ipc-bf-selo .6s cubic-bezier(.34, 1.56, .64, 1) var(--d, .8s) 1 both;
+}
+@keyframes ipc-bf-etiqueta {
+  0%   { transform: rotate(-28deg); opacity: 0; }
+  15%  { opacity: 1; }
+  35%  { transform: rotate(16deg); }
+  55%  { transform: rotate(-9deg); }
+  75%  { transform: rotate(4deg); }
+  100% { transform: rotate(0); opacity: 1; }
+}
+@keyframes ipc-bf-selo {
+  from { transform: scale(.3); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* ---------- 3. Brilho passando nos botões "Comprar" ---------- */
+body.ipc-bf .btn-buy-kit {
+  position: relative;
+  overflow: hidden;
+}
+body.ipc-bf .btn-buy-kit::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 45%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .55), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+  animation: ipc-bf-reflexo .9s ease-in-out var(--d, 1.4s) 1 both;
+}
+@keyframes ipc-bf-reflexo {
+  from { left: -60%; }
+  to   { left: 130%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.ipc-bf .label-promo, body.ipc-bf .ipc-bf-off,
+  body.ipc-bf .btn-buy-kit::after { animation: none; }
+  .ipc-bf-burst { display: none; }
+}

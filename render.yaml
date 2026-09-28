@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: animasys
+    env: static
+    buildCommand: sh scripts/gerar-config.sh
+    staticPublishPath: site
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+    domains:
+      - animasys.com
+      - www.animasys.com
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff

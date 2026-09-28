@@ -1,0 +1,1500 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>animasys</title>
+<meta name="description" content="animasys: acervo de animações em HTML e CSS, separado por app.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="logo-animasys.webp" type="image/webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    /* claro: cores do logo animasys (laranja, vinho e grafite) sobre branco quente */
+    --fundo: #faf6f2;
+    --cartao: #ffffff;
+    --palco: #f4ece5;
+    --marinho: #1b1a1c;
+    --marinho-texto: #ffffff;
+    --marinho-suave: rgba(255, 255, 255, .7);
+    --azul: #c8441a;
+    --azul-suave: #fce8dc;
+    --tinta: #1b1a1c;
+    --grafite: #6b605b;
+    --linha: rgba(27, 26, 28, .11);
+    --linha-forte: rgba(27, 26, 28, .28);
+    --no-ar: #1c8a52;
+    --fora: #9a6a12;
+    --perigo: #b3172f;
+    --sombra: 0 1px 2px rgba(27, 26, 28, .06), 0 12px 28px -16px rgba(27, 26, 28, .35);
+    --degrade: linear-gradient(120deg, #f6a24a 0%, #ec6a24 38%, #c9272c 70%, #8c0f25 100%);
+    --esfera: radial-gradient(circle at 70% 28%, #f79a45 0%, #e4532a 38%, #a3172d 72%, #5e0a18 100%);
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --texto: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      /* escuro: cinza puxado para o preto e azul mais escuro */
+      color-scheme: dark;
+      --fundo: #131112; --cartao: #1c1a1b; --palco: #0d0b0c;
+      --marinho: #0a0909; --marinho-texto: #f6efe9; --marinho-suave: rgba(246, 239, 233, .66);
+      --azul: #f28a45; --azul-suave: #3a1d12;
+      --tinta: #f1ebe6; --grafite: #a89c95; --linha: rgba(255, 255, 255, .08); --linha-forte: rgba(255, 255, 255, .22);
+      --no-ar: #4cc98a; --fora: #e0a94a; --perigo: #ff6f63;
+      --sombra: 0 1px 2px rgba(0, 0, 0, .4), 0 14px 30px -16px rgba(0, 0, 0, .8);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --fundo: #131112; --cartao: #1c1a1b; --palco: #0d0b0c;
+    --marinho: #0a0909; --marinho-texto: #f6efe9; --marinho-suave: rgba(246, 239, 233, .66);
+    --azul: #f28a45; --azul-suave: #3a1d12;
+    --tinta: #f1ebe6; --grafite: #a89c95; --linha: rgba(255, 255, 255, .08); --linha-forte: rgba(255, 255, 255, .22);
+    --no-ar: #4cc98a; --fora: #e0a94a; --perigo: #ff6f63;
+    --sombra: 0 1px 2px rgba(0, 0, 0, .4), 0 14px 30px -16px rgba(0, 0, 0, .8);
+  }
+
+  * { box-sizing: border-box; }
+  body { background: var(--fundo); color: var(--tinta); font: 400 15px/1.55 var(--texto); -webkit-font-smoothing: antialiased; }
+  button, input, textarea, select { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+
+  /* ---------- faixa marinho ---------- */
+  .faixa-topo { background: var(--marinho); color: var(--marinho-texto); padding-inline: 20px; padding-block: 30px 34px; }
+  .faixa-in { max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px 32px; }
+  .faixa-topo h1 { margin: 0; font: 700 clamp(32px, 5.5vw, 54px)/.98 var(--display); letter-spacing: -.035em; text-wrap: balance; }
+  .faixa-topo p { margin: 10px 0 0; max-width: 60ch; color: var(--marinho-suave); font-size: 15.5px; }
+  .faixa-acoes { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+  .contagem { font: 400 12px var(--mono); color: var(--marinho-suave); letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+  .contagem b { color: var(--marinho-texto); font-weight: 500; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--linha-forte); background: var(--cartao); cursor: pointer; font-weight: 600; font-size: 14px; white-space: nowrap; transition: transform .12s, border-color .15s, background .15s; }
+  a.btn { text-decoration: none; }
+  .btn:hover { border-color: var(--azul); }
+  .btn:active { transform: scale(.97); }
+  .btn svg { width: 16px; height: 16px; flex: none; }
+  .btn-claro { background: var(--marinho-texto); color: var(--marinho); border-color: var(--marinho-texto); }
+  .btn-claro:hover { border-color: var(--marinho-texto); background: color-mix(in srgb, var(--marinho-texto) 88%, var(--marinho)); }
+  .btn-pri { background: var(--azul); border-color: var(--azul); color: #fff; }
+  :root[data-theme="dark"] .btn-pri { color: #1b1a1c; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn-pri { color: #1b1a1c; } }
+  .btn-perigo { color: var(--perigo); border-color: color-mix(in srgb, var(--perigo) 40%, transparent); }
+  .btn-perigo:hover { border-color: var(--perigo); }
+  .btn[disabled] { opacity: .55; cursor: progress; }
+
+  /* ---------- corpo ---------- */
+  .corpo { max-width: 1240px; margin: 0 auto; padding-inline: 20px; padding-block: 26px 72px; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 28px; align-items: start; }
+  .lateral { position: sticky; top: calc(16px + env(safe-area-inset-top, 0px)); display: flex; flex-direction: column; gap: 4px; }
+  .lateral h2 { margin: 0 0 6px; font: 600 11px var(--texto); letter-spacing: .12em; text-transform: uppercase; color: var(--grafite); }
+  .lateral .sep { height: 1px; background: var(--linha); margin: 12px 0; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; height: 36px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; cursor: pointer; text-align: left; font-size: 14px; font-weight: 500; color: var(--grafite); }
+  .nav-item:hover { background: var(--azul-suave); color: var(--tinta); }
+  .nav-item[aria-current="true"] { background: var(--marinho); color: var(--marinho-texto); }
+  .nav-item .n { font: 400 11.5px var(--mono); opacity: .75; font-variant-numeric: tabular-nums; }
+  .nav-item .nome { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nav-item.fora-nav .ponto { width: 7px; height: 7px; border-radius: 50%; background: var(--fora); flex: none; }
+
+  .nav-item .esq { display: flex; align-items: center; gap: 8px; min-width: 0; }
+
+  /* logo do sistema: sempre sobre branco, para logos escuros não sumirem no modo escuro */
+  .logo { flex: none; display: inline-flex; align-items: center; justify-content: center; height: 24px; min-width: 24px; padding: 3px 5px; background: #fff; border: 1px solid var(--linha); border-radius: 6px; overflow: hidden; }
+  .logo img { height: 100%; width: auto; max-width: 60px; object-fit: contain; display: block; }
+  .logo.mono { padding: 0; background: var(--marinho); border-color: transparent; color: var(--marinho-texto); font: 600 12px var(--display); }
+  .logo.g { height: 34px; min-width: 34px; padding: 4px 7px; border-radius: 8px; }
+  .logo.g img { max-width: 110px; }
+  .logo.g.mono { font-size: 16px; }
+  .nav-item[aria-current="true"] .logo { border-color: rgba(255, 255, 255, .25); }
+  .btn-mini { margin-left: auto; height: 28px; padding: 0 10px; font-size: 12px; border-radius: 8px; }
+
+  .principal { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+  .ferramentas { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; justify-content: space-between; }
+  .ferramentas h2 { margin: 0; font: 700 24px/1.1 var(--display); letter-spacing: -.02em; }
+  .ferramentas h2 small { font: 400 13px var(--texto); color: var(--grafite); letter-spacing: 0; margin-left: 8px; }
+  .busca { position: relative; flex: 0 1 300px; }
+  .busca input { width: 100%; height: 38px; padding: 0 12px 0 34px; border-radius: 10px; border: 1px solid var(--linha-forte); background: var(--cartao); }
+  .busca svg { position: absolute; left: 11px; top: 50%; width: 15px; height: 15px; transform: translateY(-50%); color: var(--grafite); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { height: 30px; padding: 0 11px; border-radius: 999px; border: 1px solid var(--linha); background: var(--cartao); cursor: pointer; font-size: 13px; font-weight: 500; color: var(--grafite); }
+  .chip:hover { color: var(--tinta); border-color: var(--linha-forte); }
+  .chip[aria-pressed="true"] { background: var(--azul); border-color: var(--azul); color: #fff; }
+
+  .grupo { display: flex; flex-direction: column; gap: 12px; }
+  .grupo-cab { display: flex; align-items: center; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--linha); }
+  .grupo-cab h3 { margin: 0; font: 600 18px var(--display); letter-spacing: -.01em; }
+  .grupo-cab span { font: 400 12px var(--mono); color: var(--grafite); }
+  .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+
+  /* árvore: seções recuadas embaixo de cada sistema */
+  .nav-item.sub { height: 30px; padding-left: 42px; font-size: 13px; font-weight: 500; }
+  .nav-item.sub .nome::before { content: ""; display: inline-block; width: 6px; height: 1px; background: currentColor; opacity: .5; margin: 0 8px 3px 0; }
+  .grupo { gap: 22px; }
+  .subgrupo { display: flex; flex-direction: column; gap: 10px; }
+  .subgrupo-cab { display: flex; align-items: baseline; gap: 8px; }
+  .subgrupo-cab h4 { margin: 0; font: 600 12px var(--texto); letter-spacing: .1em; text-transform: uppercase; color: var(--grafite); }
+  .subgrupo-cab span { font: 400 11px var(--mono); color: var(--grafite); opacity: .75; }
+
+  /* capa do card: parada até o mouse passar */
+  .palco.capa { background: linear-gradient(140deg, var(--azul-suave), var(--palco)); }
+  .capa-in { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 12px; }
+  .capa-secao { font: 500 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--grafite); }
+  .capa-dica { font-size: 12px; font-weight: 600; color: var(--azul); opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s; }
+  .card:hover .capa-dica, .card:focus-visible .capa-dica { opacity: 1; transform: none; }
+  @media (hover: none) { .capa-dica { opacity: .9; transform: none; } }
+
+  .card { background: var(--cartao); border: 1px solid var(--linha); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; text-align: left; padding: 0; transition: transform .18s, box-shadow .18s; }
+  .card:hover { transform: translateY(-2px); box-shadow: var(--sombra); }
+  .card.fora .palco { filter: grayscale(.8); opacity: .7; }
+  .card-info { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .card-linha { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .card h4 { margin: 0; font: 600 16px/1.25 var(--display); letter-spacing: -.01em; }
+  .card p { margin: 0; font-size: 13px; color: var(--grafite); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: auto; }
+  .tag { font: 500 11.5px var(--texto); padding: 2px 8px; border-radius: 6px; background: var(--azul-suave); color: var(--azul); }
+  .status { flex: none; display: inline-flex; align-items: center; gap: 5px; font: 500 10.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; padding: 3px 7px; border-radius: 999px; border: 1px solid currentColor; }
+  .status i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .status.no-ar { color: var(--no-ar); }
+  .status.fora { color: var(--fora); }
+
+  .palco { position: relative; aspect-ratio: 16 / 10; max-width: 100%; background: var(--palco); background-image: radial-gradient(var(--linha-forte) .8px, transparent .8px); background-size: 14px 14px; overflow: hidden; }
+  .palco iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: transparent; display: block; }
+  /* miniatura: a página é desenhada em 960×600 e reduzida para caber no card */
+  .palco iframe.mini { width: 960px; height: 600px; transform: scale(var(--k, .3)); transform-origin: 0 0; pointer-events: none; }
+  .palco.pagina { aspect-ratio: auto; height: min(66vh, 640px); background: #fff; }
+
+  .passos { display: flex; align-items: center; gap: 10px; font: 500 12px var(--mono); letter-spacing: .03em; color: var(--grafite); }
+  .passo { padding: 5px 10px; border-radius: 999px; border: 1px solid var(--linha); }
+  .passo.on { background: var(--marinho); color: var(--marinho-texto); border-color: var(--marinho); }
+  .barra-continuar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; padding: 14px 16px; border-radius: 12px; background: var(--azul-suave); }
+  .barra-continuar p { margin: 0; font-size: 14px; color: var(--tinta); max-width: 60ch; }
+  .btn-continuar { height: 46px; padding: 0 22px; font-size: 15px; }
+  .btn-continuar .seta { display: inline-block; transition: transform .2s; }
+  .btn-continuar:hover .seta { transform: translateX(4px); }
+  .palco .aviso-palco { position: absolute; inset: 0; display: grid; place-items: center; padding: 16px; text-align: center; font-size: 13px; color: var(--grafite); }
+
+  .vazio { border: 1.5px dashed var(--linha-forte); border-radius: 14px; padding: 44px 20px; text-align: center; color: var(--grafite); }
+  .vazio b { display: block; color: var(--tinta); font: 600 18px var(--display); margin-bottom: 6px; }
+  .aviso-geral { border-radius: 12px; padding: 14px 16px; background: var(--cartao); border: 1px solid var(--linha); color: var(--grafite); font-size: 14px; }
+
+  /* ---------- diálogos ---------- */
+  dialog { width: min(1060px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 0; border: 1px solid var(--linha); border-radius: 16px; background: var(--cartao); color: var(--tinta); box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .5); }
+  dialog::backdrop { background: rgba(14, 10, 10, .6); backdrop-filter: blur(3px); }
+  .dlg { display: flex; flex-direction: column; max-height: calc(100dvh - 34px); }
+  .dlg-cab { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 18px 20px 14px; border-bottom: 1px solid var(--linha); }
+  .dlg-cab h2 { margin: 0; font: 700 23px/1.15 var(--display); letter-spacing: -.02em; }
+  .dlg-cab p { margin: 4px 0 0; color: var(--grafite); font-size: 14px; }
+  .fechar { flex: none; width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--linha); background: transparent; cursor: pointer; display: grid; place-items: center; }
+  .fechar svg { width: 16px; height: 16px; }
+  .dlg-corpo { padding: 18px 20px 20px; overflow: auto; display: flex; flex-direction: column; gap: 16px; }
+  .dlg-rodape { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; padding: 14px 20px; border-top: 1px solid var(--linha); }
+  .acoes { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+  .palco.grande { border-radius: 12px; border: 1px solid var(--linha); }
+  .det-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 13px; color: var(--grafite); }
+  .det-meta b { color: var(--tinta); font-weight: 600; }
+
+  .abas { display: flex; gap: 4px; border-bottom: 1px solid var(--linha); }
+  .abas button { height: 34px; padding: 0 14px; border: 0; border-bottom: 2px solid transparent; background: none; cursor: pointer; font: 500 12px var(--mono); color: var(--grafite); margin-bottom: -1px; }
+  .abas button[aria-selected="true"] { color: var(--tinta); border-bottom-color: var(--azul); }
+  pre.codigo { margin: 0; max-height: 300px; overflow: auto; padding: 14px 16px; border-radius: 10px; background: var(--palco); font: 400 12.5px/1.6 var(--mono); white-space: pre; tab-size: 2; }
+  .copias { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .confirma { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 14px; }
+
+  .campos { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .campo { display: flex; flex-direction: column; gap: 6px; }
+  .campo.largo { grid-column: 1 / -1; }
+  .campo label, .campo .rot { font-size: 12px; font-weight: 600; letter-spacing: .02em; }
+  .campo small { color: var(--grafite); font-size: 12px; }
+  .campo input, .campo textarea { width: 100%; border: 1px solid var(--linha-forte); border-radius: 10px; background: var(--cartao); padding: 9px 12px; }
+  .campo input[readonly] { background: var(--palco); color: var(--grafite); }
+  .campo textarea { resize: vertical; min-height: 60px; }
+  .campo textarea.cod { font: 400 12.5px/1.55 var(--mono); min-height: 170px; tab-size: 2; background: var(--palco); }
+  .cod-grade { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  details.js summary { cursor: pointer; font-size: 13px; color: var(--azul); font-weight: 600; }
+  details.js[open] summary { margin-bottom: 8px; }
+  .erro { margin: 0; color: var(--perigo); font-size: 13.5px; }
+  .dica { color: var(--grafite); font-size: 12.5px; }
+
+  .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); background: var(--marinho); color: var(--marinho-texto); padding: 10px 16px; border-radius: 10px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 10; }
+  .toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 820px) {
+    .corpo { grid-template-columns: 1fr; }
+    .lateral { position: static; flex-direction: row; flex-wrap: wrap; gap: 6px; }
+    .lateral h2, .lateral .sep { display: none; }
+    .nav-item { width: auto; border: 1px solid var(--linha); }
+    .faixa-acoes { align-items: flex-start; }
+    .campos, .cod-grade { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { .card, .btn, .toast { transition: none; } }
+
+
+  /* ---------- marca animasys ---------- */
+  .marca { display: inline-flex; align-items: center; gap: 12px; color: inherit; }
+  /* logo animasys: fixo no código, fundo transparente */
+  .marca-simbolo { flex: none; width: 56px; height: 56px; display: block; background: url("data:image/webp;base64,UklGRjRDAABXRUJQVlA4WAoAAAAQAAAAvwAAvwAAQUxQSD8pAAABCYdt20gSHHvGyUym/4L3O1wFEf2fAPxnI/MbOZq7pS8kBzNPxw+6bXd/KAMRtv0h7WFJc5LvAvYFn33NHAOAXnUDkKL2EPRme52WsmqMLT3QdgNbyqoRW7qQOICNlpRjxLAEkAQuXZIAcmVmkg1AFf0AdGdmEQVJ0RET125AWVcpM4KwTXJ5KWNU1ZFyN32pWOs4oqoqrOzuuTcZkXncYhVpKM7ZJBGRtksToLQl+0ayTUoAoGlP4HL79PgC+PCawbBt2zAR//867TbsgoiYgPmh9gddX0VBr8lH1Sc49NZuz2MXeqmj8KyijWfaDjxJKqssxCltmo6HmTldJSo9hmoFFRcnKPuUSpFzRVF2dds4NFNozkXVzEzPteePatu2YZT/f85sp20BIiZgArzR2nZsjrZt67rt+3Ee53mWg0qH3Z1W2rZ5sS/e9nXjwmPdtm3bti5bbaWVdMdOJZXiiQP7tv6oCjuVf88YETEBemxrW7ZHcM65n/+XqlTVzMwMUbc54gl4IPZQHHsE7IzZDjFmZqYCSf97n+D9fo0hIiaAeJEJHk+AzrFIunCSpHSORDIBQDY82o7tIBVz/fnZEgDIcyBjArD2skvWjA+FTjXfE0LW73aPHdm7fwoCz21oLjSuvePaDcPoFGVRVk45Mk9yFXPTd6wxgOcuTgI2PfTwpaHb7acypSoAkEuePNVFGS695/5Lc4BHORfh/m+4cajolSpTquqyBF1gw4pOpy+XH5vSBfdc0cBJzRHf/Qv/5XLvuCi6GxJiRF3PbnkyXzm+ckXLUm/u2FRv/YpdAM81SOH+b7llVa+wQLA2QLByrhz2Z57x228Ya4akVGUDw7GYrsfHc5xjMuGa912XihTMHQY44UVvcGX/mS2Xfes7Lqz6pSXUtVw2Ot6sBsdGzy2I1qN3tfsWCBKJMtSz0yO366V/x7tvsdkuLCA4QQhec8BDOz+HMMe1DyzvMTODHMFd9XS59sbRn/zN6oG72EEIMiwkIIOAcn6e4ZyB4l1X9OsMgSQSIZ/sbLxs1eYPAVeOWyMIFuEgQJGEQkiFh1CfK+C8mwe7AZQZSAndQ+kmm/rITyD7vQyDTRMBmECIpBFU7WII/XMCYsOlSKIFWZQLac/MBZe91n/iF4FfBWPeCpJAAbAAiBZUuxLQQLGf8aPf/+0c8CnfDDBzYGTTUIGBAGxG44PXtTMltDMQ1cTQyw/9Yljy4Ee+uHSgg89PfgQXrEGVjQ3CHpvLrOja3YgidtrGZmq+/ZUbxaXuu99xNhlcnpkaWJ/XxMAlCC8+M4RYRQvEJhaIw3KG9/cvE5e2p22eCtXp4xerRmqhHn4K9N+GxVAEKC0KxpAyY/PxvPuwhAvwUz3NLI7s28+yZBD1J1X4p8cHU5bBBo2CpA7GNMy0J9y+SlyyiDk1pkcZn9/5AhN82ae3hfo7ZQgBguKudESOHUbE5uqbsHThcB1gwGF4OW9TEoj6+zp+8bcGXcEIwQWUOXRwmhCFwcaN5kuUcLAKgoMKnAMKol7+4jbDd74ySFqAWwFY4EE9Eo224yXj4JIk7J1pkNcejDNTIxkQJr9E9Av77VsIAtoF6Yq7kGfqCA0PbaeWINnhXdEtsHLqPClogA88Fwh+na+eeRhbMZF3YsQ6EZivWprYebkh0QCe6bnGIEjtpxGcn0cD3DJWJwYkZIbAFOKy/cLSG/BUMkpwuAAtBUSmFwHw45jclWpLUpoBd564FELDx5Yg8yemgwimOL7sTKSFYL0JQLxDyAcWXQkYMDbtGcEBJCy5NHthoAJEuD0PuS22EdbtQ+Q68lCJypsFIjAYyiUsvSH9vwgX5Ro+vjQRm7Iy1gDY1++gIaElgEVJU8xlAMqmQS0x5ld+iu4ywj2nS5xpd7mbAPCffzhBJMBGBXFAYkLAzA8sPZzc1O4ZIRLfvGV3E3JIgoSQA8JWEBSAwgwpXUhF5wal7Vhqze2SMiclNuZ9ftl1rJ2Ci1IVl4HCC/0IUABCABGLMMQAqDh9GFpisP86iQSkaR37cK5vN48OiUav42WAc/tr0UGCICAyIw2Jd2QxtNmYlhbrDa6sCKJyZiNn0v36/8xVbJFRKSndDCHU/4lE4aGmzjCqNGACqfyjCL6kEHsuKaBQFtlA3oQE42h619xoSyxlxVUrnI6/KYNjoZIgxNw0aAXJDjwBx1IqTo0vq6C+RlpwQQTIIg5t1UrVlfrLb4K5bf5kXgNCqigwKoqAAtfwv8LSkkLt21ha6rWGkUASlLuUl8/PjhXdbi+9iw7ipxUghRAH8eHMCKnmzN9SWFoOj7dTwmDuIAgYzA3wkL+yrVMVPnPTNbJkX/yrvCYKggI6N844D6/v+xVYWlKC3/iDRaHlCDEgEiTl5cem9FSV4XObzU2r70+GpQCbACIOzbwRsxyPDIBYUqmfumaayyWAgLgvIPDhh41e1hU+LoK6enUtRQxANxCwkTezDBdvdGJJNWz6sQ7GXAT5dAdlPliVqITdz8BBXMIw0cIQEGSyPG/a6HoQS4z+3x3TyyBCemDdFpQQ6qSiLvnaDAFgmFkGSOEBqic2Yju0QSythrU/UQwDAHmFSO4CCKb9darKtL8iIPzv67kNkVvBwBxjq9fFkmv69ge8IQIqwgXl1ULk7M7GoihnJyEA/It/4/Mijxe8bx537MWSSwz+1HDTAS1KYATGgKAA8iMz6pUp0UTAP/qrH56fXh4oovX0+dzHt0FLTtCjP0YAEhbPWrlLIDgAbu93+/35mcEWIPz3P/nnv35+7mW33YXnt2+++lN/1YOw5DrfHb4d7j54XSIASZhv/slUZa/bX7EOTgU8+yM/+earR3HcY8/95z/vQvClx3TVrf0EQqKiCiBfQdg3/+a/odPrV9XQxSNwMGAr1l+zafVoqz66c8srB4Agx9JLvGtZfYIEMAHBQMLX7Okfzfarui57jRtuGYXXbFTCCTK4YwlmGnpLX/ooigLkHkoKwb75H8/FXlkUglbe85ZLM9QIAQ6BkAtLs+GBS7oA4x6vJHQrjIf7bvOh1ClrRktY9+DXvfvKnV0ANAnCUi283R0sQkIg0IDcSxARrT/c60kGZzMU+eXvOLxz+7YDHQAgIWgJop93yyy8ZR7Eq/lANBUiXtqvbB5SpCw2AhpUM/Sn5ud2b919pAAAEtISY3h4ZeGJu0BICQEBca/inn0iwYiYhRhbWRYzSyXFYvbAju27j1YASEiLUN+5voSDAaQJIFACAvEw6Bfvr6pg7bZAzRff953n615zOJ+fmt7/2o4D8wAM0hJBrf7fSfTowcN4OFI3EUQK1djY4YZSQ0s1wz5/38+ng3tsOCOsnNq+ZfvePmDwJSHo/vd0KCwQAQVkEBUCVEFJqy6eKSrgrIaFRJ6VBw6nPK8tsi4Pv/L81i5g0tnP9A1XdSF0BSQg9wYCDBGMQMIba/dlOHOYMWpBQgjNNLm9GGuVTgXrH3zpiZcdxrOewoeGS0G4rLHIQ3moCQpIALDaUM9Fx6ejExhTFhisGQ5u765ouCcwxt62z31+znmWE+d9kwAtJCNEAYKC4qGAQAK4eH92OR48owLFGKJZaPjOXa1RJVLOhvZ9bADiWe3oqneWkMSr8okVgreR+wKC1crhY15nZsYRiWIWgwXQmr710FjuMIeUNd52O2Rntzvu7gFCCYLutnHmnJG9NpGH4gBAqC49+p+bN+egeM5giBZigAWPrenXNCSBhBwXP7AO4lkMq/YRyBxwUgIQs2bmvbIu3fJ8IGcqa0ZCAiRk8fLu700WBQkzhK6AqDlOLz/w60//22JsZDFm8IHJX/kw7Kw1GD0SKZmDontoNfr7t27buX+6108hb69cf/E1V61lt5IAEhSE9taJsgwhBAUKxSiEff7pH2yqkYUYIpEajX/42YJnKzF6DIBgglI+1Nnyuce29XCSK297+z3jTSdIsQyudx9Er8cYCKIg064fHI/uDw8MuFkIGRBSGnnq+3H2zucySQYob+7+z89uFhCZfDEzIAk4/2v2DMQKciIMtOm+3UXPLB4RDxCjwoBPIM9iiDETKdQjh1edtczLSAgeh7b/xbOAwQFYnkekoqwBkJTjj/5hqk2B91vnq1qzJbLgKKGMMwOwwRDZcAwWCIJIzZGxsxVdiUE+cvSPn8DCsOaCC1aNtlCXvW73yN79hx0UDUf+8YmYyVSmrFa+Z8bKLAyOMTrMoNSgNDMLMQSKhJLaI2cpB12p0fzw3wNA+6pbr1yfIfV6/X6/rOui6uzb/VpBwQO2fGqqDSRDzD6yerKswtMgzAiEY44IGeSIJgMBIDDmZyf1Mk/Dk7/VAcL1D1061+iURZWqsijKsip6pSo/8txuEJLhyztyIu5qvm2+7vLp+emccZDDwJlmCJJgRGiJAEUzNNLZiJpN5Yotv7wPa97xv99342D1zUdGHFheFtzrlZf2XqkFuGHnqwiEmQQWq6rYzmAxBIqj7oKaOsJwfuC9aCBAC1n0dBYyzPngp34ZF3/z979led0H5hyFurqAlanMLh99CgsdvdfqIEokgNHZFTkEWDCisgCOoYrz2ZdHWiRBWDBJ3bNPwNTo7/zLde+77Xbrywwig9pt2BDMYn3+ypoAoICJggIJsV5uWTtFSQwGeLyREAOe+Z6BflsgQYK11VNnnWgH/3HLzz443OsrBAiAlaiSKyAYWFw2oQUQcawAAbmoVcVQZQSkMEcUZm4HYwael+8HScIMptDuz55daAn9q/4pP3KsEUBSDgQHiZcC0QCo6h1eZOE8IyDQ1MqhysxgYo6ogyLKXRqDvbYMMDIYzWdmoLOHOcY/8J6h/lxTogEQcRhBa7uRAEG1j01TiyGLDhFgGu323YPRLEfuOd5G0HzsAAiCNIuqZJNT0FmC9MbXfeu6zhwpEwGlYBrGOTO7qAECAizLXxGO31ANGuBhYD7UpNHY0E2ZEfQByvI6B0AjzfsZGgd64axAS7jv/90wN0vCbRE4Ick5FsVSAEEYWss27zUdB602CRfSUEvRDYSi5XhoRLwPNHgM4AIj+1Hg4Rp641Fa/5Pft3oOAzizgGAJkFGirEq9flXW9NodAM020HGCP9lyCIS162YIFuzMzHmalICZG4x95qoonnOZWL+KNzyJ8P5fv7NbGQjERBkgAwQ5vSzm+lVyg0wIBre1I9PU8VjvCTCgabURJIRwG4AjAtjTmwYVZqYot96uN5olXPc7748dkiIWlCbCaC6JkjrTUxUrZRYbIQSjfGzFNuK4xnG3YLDUKizEYKNABGEL4Chz3qxyk7lC7Woc2Q29gQgMvuvmi2cQAHiFoEAHkWBiXdTszJX06enSV49nrUaAp9YYTtjbl6QgwNHwhoVwoEaVRTJB7s8rguB+jCIRd0+a3jCWcPMjy/v9QAECEANuJoecSbJl48tbWWykbufAczvaK4fzzOitxolR42scENW0SBEVHWdIGU0DHHDQ8mVzT4LCK13qjYLBhzYVygyQQBGxg2NhmSysHBy0fsddIkLG2Re/1B4PWVTDTwzE2qEeBHgbkSaCElPcBQ1yFQX89mq6AJi/gjemCVe/aagXYoAgER5tWkJg3asHljVme0XfAQIUpNg8/O9pdZMei5MAcV4rgQAyGcQCZ4EqXyNG7vKhllswsjG/FXoDhIS7Lu7LRAMAugP2CrR6ph5bf2FjonQaiYUkAK+a3f9oL7dUz5wMgAsiIDhBW2acGCiAELl/FCR1v36bJblgHg7u4RlHYOM9b51JARAECYRUllWIZf/D84/80Dt46dUGEEAQgOSN6afHZEd70MnEDz2JBOBGopkkIQ+VWBgggIo8mDScTI3XjprOLCbccK0fy4DFQMDryp1pulj+4z84xZDPi4AUpQ8s5Qf2h4E9oJ+M8KUTElE7oAapgYp39TIBJNWcncLgnFGQTws6k4js1lVdRkKAZAC9qpPQnQ/Lzx9ilyMFdAktBgWAoDZXQy/ATgqSMABKjRChMICYIZZlw0GSaO5UGnAB0OY2n1HEmusadTAIcAiCV1Wi5jutdWsjagZA1ej4Ah4GAVG2w2efgnAKU0ElCE8qtIQWskDI5hoRJIG8sy0UANOtbh5+hWcMhYsuqpIBCwSHl2VimustW7ccyY0gKyKkDhyIIB57nE6b5+GnAuJIytylH0GAhFJMkGYGEwEyDT/fY8nImQSF/PlJ8zODCVeOl4QgLFRKNdCfwurLBpVAABjKGsM0ILXYa8r6+UcQ0ikBsXMmd2xnLwMJ4gFlM1VLIIjm7PONMjHagCgnvowzk8gua1ekjqNUK/Smso3rc9WkAOKhAMTZghJ3X4Gp83kIp1bAy9vzcC3DR8QupTu4OjTqNJLe/lytwk8eNRhd8chj0JmAsYuZIigQgFKC5mfzC9eiLo3AYpYwAMvZ6IuRIAT40OfIdIoWvvaZmS/32rlWaWkBQ54Ox5YDtDT85Mvtsqp1RjxmJqj56k7TaZPv+WEobyK5e9ENP/DdXAgEAgimADlpTgkiigCU+go49fH1X/jeh9KsR3MFwQjWtXtVa6CsXRLYPvT7Pbgr9tptg23e/8zqZKeNH/qejwlaJPeizMaG9oUBiVuAkAqKUzXFJ4pIA0/ux2ntgLd++x3NTgU5GAOYqjoBMBFyR/I/2ps53AmhmC6c6/pSPD3xA9/1QQwgSGXKh3O5JK8+SgRCca5vogcBANH6s8pOCyXhzq94YF2oelUFhiypMcyJVEEAUh1/5+XcF+wWIcaxl+yGmdPEdz5fdFOgujmQJRA86JV7Cgm03kxQgIRAqb3tBZz+4MLYrbffsGHZcKxq5uWrv/5j22Jyd5FefSoAruQUXStcHHeqdatLO3XCd58XKlB6mS9aUU6cYLqvAAYAq44YAmkBZWnoL2CnDzAmACvWrl/VqOa/6au/+7kYJcFTVqU6GCTI2dqgWuBYfWMhnjL44k21N+S8eXccBKDjGNKUgFgkqAkocWtNVJj4JHgmADQkLP4q7rwpJECKcd9U5gFKSS5D6trQbaD8ymOn4bQDPeTtZ1xLgqIg3UiAVwiQCBM1y60A5SN/C9OZsZAkLaVN98WO4KoaaeekIAMkuUCuKBjXYSjWL6vsVLmFY23PT+y1LyQJioBhEiakABRgR0qLdrmBnX/BmW1S/m23xZLJU8wOP1G0ARmTE0C0C1TIjKDy6ilRIKILIQky1DEPIcPiqmrQTAQIQgOVQABujdqNRCAf/ASsLmRwPPLfbylTIMKQf/gv5pYlES4KgiAowAkiCAYSqb1xkjo5YKp0ByDVjVEDZo4dnZxPYWjZyhWDQCoYFpQQBAoQAJq1AwPpEv4WVBljws3/4+HUaQTFtj3zj68OtGolwAk5EpjMJCNpkTSRtOoyl52UMFFSEuDNZTj42FPPbZmYEwBwcM3lN9521Xnog0YYUCWIREBNd0TjggYeL1ijqDHhmg+8tdUF2Wz2X//Ms3mrL6bkLhiSAwTgyBwIRsAhwMLlB3GywoE+asnVGp34+3/ejkVJSsLCNW/7hrusTwvDBAqAaGgwKXFX8+8Q/MygJVz8gfcMzyoLLU2+/MzhmFeF10Xf3YM7kMBkhhAcMIPMzEhYed5YnyeBfQdZ1ynlQ1t+7ZMAokGLAgTJJODe//4e9qs0RSEkATlFEqh89xY4zkRawoXvf+/wHPMG57dv3VU1s7roz8Ss0R5oxECoLMqi2+v3+rWUSMC4ELRq00HwRBSOvG5VXaPx2s9/GciS11jcKMdCWgIe/sG75wW5qyiAlGJIAyikwX9FqM8ALWHDt3/Vso4a7B7aMzGDHEW3l+fDK1tZ9NqrlNQYaJqrLitUveGmJ0kEIKEeHJ+kjifUz6quyzDzH38HAFVYNz484N25owdLwJiwaJDb//q/b4C6ABVIQjEmyYRs7jMQTrsHbPi2rx3vVOgfPTZbMGpuumZrxfIW6qpG8qRsoD64Y/vu6U4dG43h1V/Y560WnAJgNL/yiHgiX+6kssKW/5gAMHLTHZts3iLh5eTOxz+zC6QvAILrb/1LPrncQcaYJuWy5jPx9M2hH3v/V503P586s7V7TL1OR2FsZFBFcq8dqYrNY08+OYnF09zkxJ//5I//+etsoQaNpJor9lPHwcy1KOv69ZcBXPTuu9c11E/////+v2/9/t/9x+PkY3/2UQR/wHWwc/sCjiCQlG8zEIK7Hq95mowJ57/v69ZMdeuijqEu636vyAabLaQ6uUxAbcP7/vNZACQgAATlQHbLe+7LLEYzqFh/WLYY+6Mj81V/3zSw8t1vHy1cEf785sj11f9lY8i/8DOfgw9AmN4LklMRqcDnARCAOLENp9eYsPH9Xzs21UsWgVR3ixSzRh4KeS0ludyGj/790wApF0AQgAAyAfdsGWjA6EJ7fC+1gJq6cL4s5xy44fbhroIxQEwKYwaO6o++Bx9BhgJUG0BS8fllEkHlO4+eFmPCxe//yrG5XjC6eypqZk1zOdzlYnLVbf+XjwImF8zkwuJGidKTj1VNM5lV6/fIAAiTq7J+JDBww5r5FCwYQU5AyGCmOPz8T/G6iEE4IAI69mZBCopzW9JpMCZc+v73rJgvjExQVXrWMnfJKddCT2l0x68BpgSz2h0YGh4M3pubdgAmov/C0UwK0MDQAQowzZw3Z1uB1vmtJFowABYEASwEM6aRn/pFfATA1uAeIkBvTQZI8fWpcMoMjive/95lM7WZu+QyAyFRSpCIOqHW6F/+PUwJxspx2c23b1qeoarK3qGtL7ywGzAF7JrOzGBa+5IIYF8b3nkCoVkiSGbGZJmdCaAQLJDmH777e3idPrIpb2yAvHlKlmoCe5vxFB05bnj/O8dmi6ymuScaTA4BgJPJoYQ6L3+4g1CBVun8976jie7MfAlPNNX9Yy9/8vF5B9CpQ6D5aGfaZNg9Mj/wSuoXAkkYaCQspGZoFmiwSekRqIt/8v0huVdv3hRwQzZV5KfmAO784JuHZ8oIJXPP5EJwIClIDsIdrJqH/i9MNULt13zw2pTmtqdoApJUdCv3/vZPDwAABykaR58VcCwFThzzg55cIOnI6B4wCGEMZrTR9/+P14k/8EUg9ODpTZ8kGrtGU/MUHOj3//c3x6kUlZhgzlB7cIODkpx0SKhHnvvQzlCBrFZ//43oTpblylG4w5JU9oqqV9bV1edDwOC4yapVO+vgL7eBrb7up78lBQY0HMf7KBIJOzZ/AnpqLDooQMj5T1WSlPYxjQSdhMHx6H+765e/+X+e05YCATXEfUbAw/wcANDx8Lva42Wop+rICzCvBeFljwyujSDWNkQfLHYYdoSxaS8ufRFGuzGyjCOjChJMlianjwOrXhmvSRKKzn+TzGL3QPSRYfBEaAlv+b/3ava9ys6MMxKKXOjMGGNBnS4EEKMPrvUKwWdrAuCALzszA/SrOosAXh+qifYXhYnYPjy9LAtIhoII1MEBVQzOxvTRo9AisN0xF0RCOP89BU/hcD+kxiqcqCXc+r1vxzSjxGApoinmeRocMTSKBADEeTegn1lIHVEyKVt0HDhl3etQ0HON3HzF5pLdZfMpX5dGaUYMwBkc5WFohFl3onOEixEvbnBIPJz/Q0I4zECdbzqOOdb+8Dc2Z5wKizSlrAQwDS14ZiZkCQCE5StAI9mVOQS2mQgfTlEUZTlfhbR9Te1D+3aPNtYc2Tve4GjrTUfnnAlR5E6AChPYNWlaIDuGwYoIpPM+SqmeCjKuWgUuYsKjb1k3X1Mh+biYjYmApAak10srYlE2ARJW1AaBWkcuyAYP3X5VdLuzbvuH26lRfGHFiuXV7EhtKgN4R2JmjjOeESRIWOcAXwIEAMRLFwtaoPiYAaEzmyNmrYux0Byb3r2u6hGCuReC3EMKh1fPfhEBQJhMIijkFQFioSDMoA5FSmUpzgj7z68sfGbZBeWuVpQxcmGMzgwEifI6KXAnwlYsKpsfHK1wr5aJjan5LMbg65aJoOOhW1FESJLDVAGTKHCsXS37gXcAIDtwiKComAESBOoS+oCZOqXaLZY1DqwfTPkXB6+ceW0kuXTY7dpg1BmRW4qAgBQPdIcPvAgHAGLb5c5HTBTDDEOM0YbvjohY89BIbUZBDgcCiQAEMFZD59svvxsA4sxTkAQymgCY5DXDfc4Z5lRVXcOQD5SIGzvNp4Yn6htGEKgzMrOLoOiMGw/VQnEihK2TYQGo7xur6OE0Z2BzGYiQ6eLWk+mq61FHM1ooWmFBC1SsACWNjoMCTLzOnxFadCDBGRxh7c46dl0zjk/tjTg/TOD6GMx0jjGCiioopAOBgu6Paj4lCEDw279pzl2wadSo5xsGMwu92/Z/yzqIpIEgzVYICogwJLFqXQkCAA/cbFRwHUGwxBBSShplW3ELJp5u+Yr+BC5yI5FhxuMdBOc4CjgjgMweeuy8sAiEHwsvEfXUtFCUeTAS9OZXrgAJ0ihoZEgERgoaBGW3YdHQ1/IahSyOzEBbkxIzKwKuM7xiGZ5gGp6fH1qOYByAGUCdAdVhZuShKLZDAQMHXzcBCP7VD35jtWvbQsWMkaCFBn6zMhgJUICW5YYBLcsCau6O5ckAyDdfZhLAzoggudydBWYnKDzTGL8EL5fWONZr5xYILNhQAQIciCAhBK/tCGTj8XkKYBr8AUSDRlLfM2QQGZjN/U4VQCMI0YAwkK14GNvdcLUIALHcP5Zw/FQEk4b7IEIyw7QHrsTOyeBH5puRFgLHuR89PhB0nFFBgPi4gwFAegILDd/5Y++poJ1ZFTJkNEBIK/75L/uZFhBUsAEs3dGADzQfAgHA8WIjwpBGCcpoUKImY+Ewc1pxQ/PQIXam5iPMyDNzOGcGVF4NS4iHna93RQPVmHkJAixd9mvftrdGA543LAoEYL7m0797JCPJQymwxRKCsg9vfvzRphaBPr3CSNxzHil3HVP0JCCSx/Hz0qTNFEeKwiTqPOGMI8454mMQCW9+dagBkmq/ui8IAH7gi5etLkO/ilkIWAQauur1P30lD3g9BIIAlqiP3/Fdb25PBgAKnSfbvpgIKoiag4BJFmIEG12Prh1F/9hcNHrshirj45nB8SZaaOoGg0/fxC87hODHLu4heapDu2sNwaRmF6uHLvzX1+5cVksAJN3IqNiAVZYrfCWPL/ktFhQQQVEgRtoRAcwESBs82rd9YncyE4wQyNEJFRAkSQAQKPpP3hkrnoYA338Bq1TXrsF+Zg4z2kRKdvne/1wxEmsBQhiRkE5CFtB76/J88BK/glTRHYpA4+4IOI5CI1o2F6cnYHgtUwgjQ4r3m0ZZBBIAbBZv0gHV2rvVhOBhbdelxIHZZqAlYhZilBdrVjw2a60IJbxeC+770CK657/Fh4fX8uOgADEo8ACYMCgkWVF6tF57ewXhiSISo3NmZtRRuQmOCpAANd04MoJUa/MMRe3aIKU6pXaNXJKzEQN3sGcbWuykLEKSUTh9ePE7Mjn9a3CC+Q5KxTtQeYsAERFJEGLS6BcB4YUjDVBwnoxPVUeImwTZfJmHoBLEYwBC0VzVq+ukAVYNuF17Nha4gJDERqb5Xunn+dTVvrx/6enLz3SGzr1Xp/Aocfh0NSRSPlUQxhG8w6GPALLZzw06nDPIQwMDKJTHFA/niE/MZl6AgL0XdOu6Vowpd1jBNbMCBBJKHvMMfd4sEzCfv30WgWrwq3H8YL8GfCDO0MbDWm87SkgpGA6tmfoEFv71DAGjM85xdBQHlXgsZdPdPImCkobGnr0GzsbhyhMw1M08Oq4TJZmDqJ2BzqwxVzLOUWoke181LB4Hhv/+oNIAAlJTNDyWSTII9e4HPgwCbjs+MqLx4ejMFBC0CuAGAIeHRJS7AHjrpXkj9m6sAKWRXiDl1tAiwQBw0UBeHhwhHMi6l7zDDcff4d8ClRCAioAakIqARmGNY5OP/hgMgGn9w6UECe5QyGPRBChIFIcqIz5R6PqePwZA7xutqboRrRGiRxHVuDugAVQNLICl95lw4i9DAGQCEAEklha0yAEybfDuJ9fsFRbVnesqYSF1nBGCJAOhAMHzHmkEfI3YV0Df8JYOkiNPjWhPx6OHGfUoE7YkjqwIOvN33OLhhByP13Th4QiVMwOzFDpLICCjr1+5f6hvixH3DFfUYiB4pwUCRAojWWVGCvgaL28P7CHw9cv7goaRx0xGp1FhVNBVhgUDxLmaX4OTFF56vSEiioJIAQMpi3tjMbruQOMwjksf2T5QA3IBSXGXx6TVP7p9yAPxiQ/6kG2dCb7qTTOy1K4TbBgGXceQdBgNNYCI8/7R5bKTiOWn6AJhKkFQRNAy0VjUcOWb9rB7PFCX7x0qnZIO+DgEIOSYn37TQ5G0RboB2bq2iX7vSrjneRlthifpPOmAOKDK/TbSvP/ZB5w4SeHPUsTC5C4oBElIMyg59mFNdWSWJwDcccFLo6VLgjoWSsmZiD378PKGDzUdaEyRiEqotkPZOwYSMFbldg6MyNjThOyMPAJCiT+Kk0/21OeyRIkQJUUkATYhmxz2swten69xwkceGfiLgVZVqwAD8bBCjif2IuFjq39pWaLGw4oF1Jjbj3RFx71uiWEGRXDAI8wIFBQQnW9/30+5nRSInwdxF4hXFQxgQ1Zsr+/o9AJOsvzfjXftHMr35QLCgt2XkOOxf+lAqPG7Y/86Wj0VdFsKVFc2cwj64+GkkHuMcw4DKDMDDqiG7QJ9872/K+Lkk33so3mFECGgJhvYSjqCdn3xj7cSJx+0t1p/HVTIjRIQQkT67K9+EkFwgB7P8xD51Ova5n9+RfseC6EaHEgFOzIAIgdgUAA0w504teZX3FsGSAIICKoJmalAyqx31ZVJAVO9+b533XdxA8ed3frJ7/xbAcKiVGvFNS1FD9qXlub/fcRFG2egahgoVGQYEBMDUACW14yIEhAPtypCMmOA3AOoxnYBhbp1EwK0QUC+adPG1UOhnN39+pYdAEPCCar1tjsULde+XBfk1wmbWgrlwOfI05zBow6jJx0WCmidNWudkN8AQKKS6INAKqQNWEZsxGk0JJxwZMJJnqcIFoiFDVsRcFVDbu8cZ0QHR0VQZFRCMXAxiFNNNdeBAgE0MO6B98AV8hWZUweQBgggJMdJkyeM3QKCpN1C6fm6wuFnpMrR4Sijeoxi6vp6nE56LkAA7wCBIQjRALQovKGv9+0V0FUbRVvdD1nW9PjxvG0GZ2RmGMZG5PZy2Wqc7uoAooihApG7QepLK03U4BuL9/+3gCKmgEWvONoOy/Ov97OebHRkjjP5JOjMfLgYjuJpQvelsuFJQGiCII2uvnv6xQrCGzu++R/DsO3ixV6bQFkaGm+GH/z6+o4GnGEOgypo53q/5605TrcMn30C7Q+hICEg9LJffvYXn4ThLNg7kMokTwKWCC7t6+/5I//2T9y2sdtuwxlooIk0MQgIoegE7wgVQ+I3/e9rUZUGCpKg5AlZXjz2Gx8GdRYQtfWWrM8k18KUq/Eyv//tS1dfU6mVgcEg40IYmFVzZaaZhJrmyN77LXcMQWWSXKQ1ou/79J9/BhTOjoZ44+perQSl1Sif+vY3s/28ZGC+2ULNICwwC1ZPzyOf3+M8Q4CQgIvuv++aNaMBgJfHdm7+zOcPAyHhLClo/qLLUw+WBDA0MO85fHTb8MZmarYjTKTRvD/TrbPm/tdAnLk0ORBWr1nZCj4zcfAwAGPCWZQqwyUrK8+YDDdsvIqj5XxrMIUsy5uWUrf0lOJg8fRWUGcQADMlnGCAC2dZ08ToRa1vs2CNZcvhtnL42MFLLxyuC4FuIRqzHZ89CuHMJ8EFknA2NpVHRn7+3ctHNqzYTYAnDYxOYeVIKylE9Oo499E/hQnnoEFTf//Nj313HxJqTXNCqJH3uyFDSiFmnS/+41ZQOCcdHBsfvX9t7PVlBAUuwiSIHhQ49cx/PA8TzmpwDN724LVjoaqSYITcFlBZiMWOT3/qIEjHZY0JWH7NjZvWDeYAkieakdaf3PH8M68mGBznujQ5gPENF6xdNdzKiLI3d2j3nl3HAJiEc2IaEhZlpGphIU0SzqFJQhIAkIQknJsTEP4/ygBWUDggzhkAABBmAJ0BKsAAwAA+MRaIQyIhIRXJPjQgAwS2G4ACBCon+5/kZ3p2cesfj1+SXyd01+kfgD+5/+3/Q/Ivv9jAetHwV/I/x346/Bb1ffoj/ie4X/FP6Z/of7v1//299UP9Q/uH/e/vvvH/6X9Tfdf/Z/9L/nfcA/pH+k//Prkewn/fv977AH88/znq3/7//3/6T4Hv2m/bD4B/5j/dv/N+f/yAegB6lP8A7Ir/B/i94Zf57xV8sHu73JyviPvmhvG/6F/pOHd17zFPZL7B/z+O3xAP1j8XDwffKPYA/lH9Z/5/2x/TL/cf+X/Rf5T0p/nH+U/9P+j+AT+Qf1f/lf3/2vfYh+1n//9yD9YEktas9TNlsgURlDc7oBQa80koZEO4Fa0ZdgW01jheKaYTS+8tE+r/9gx0EUzTy7l1hF6MDjx4vHm30wg4gY7fgq96Ade7dQbOlvJREyJvLApMXuy1ord5l6jNn02U0kZBnh9V8DWH5CvG+avyfN6W1uUGUPiCl+DOjNymujOSKcbC70fp61bbIY026FI37MUwunKzolPxK7Z2B+tRYKphsEiUpD3DwGHuREA9VCSMGEbq2OijxR4BDTYh5Z8tfS9IdQ6eiDbhnff3XfrFnalijPGSmXpwBerGw/hflhuSL+i0NxcEkhE/t8Exs++l31hD3f54MIjEw+QvEIgnLmh2ACFjNwZFHDhgsDktzDBTnrkaSlqXCNAnyFF363FdFV1Wh5yBOcPEWK5/Ob1z3E+CwoAmbbdIsqo+naCDJT0qUKZjDf/UBq///umk000OsTR+ldpTbmY/IS82Pz2nv5DjzafObYkrsNcJfIkc9T5gBZOqMvXm9aaki7jGvb9f89zvZprlnXih0LevleDGyunzuWwQZ1YyRAdwrGhZ5bZqmQCEAMvUZX3XwGQ1+bcRMQsEnYW7bz4ctRvdx7qcicbcz2RiQ8hsibrJ8vtS5qHjpU/8pgpp0vk/8GM4u+9iyd0ky0nfh8IJvq1fV0CnYJPTQ75nRLX9SIhOfR9oLJm0XX63vVMYRU6YhVvIv7VHsJ+FlSO3yzzUYQXRV2kxoB9L8qtJZVacErpmMVY+tCBAAAD+/w1kCshHnvUzjvPMI3mP6f4M27fkWtiarnWj11z0Y4xkeQQGG20AaE60zeQZS+OWXrqCCIfXzfz2aAjY0nduu89gfi0Cox/rZrInp6pZIag6l6n6vUgFQn01/+u/qKQ23RD8oQUS1CoqHjZrXs3l6frg1iMGVkA6l3k5durUbBPPkBy6vtD5eXlv/D5n7KWHoB6tim8ClVG8dJAn4TjrQmyasLlMfaCudpFyd3AJ9Y0QZbWZ3/0pcpRbS3fjhEf60ly3PGi5hiomju2YkzaYHN4wx7n+/v767UKk/gAOduRAEDVsfB6Yuau5i0DjnilJEMWcil72I5/X0F4bfmOehOAU2bm35kVpnNnKTQDYvrmcbq6gTwMu/V9xD5Zt+IDjnHydwJQCQFQB2Rhgm8mUBFdHtfxCl1uFdmHz0/odUeTtI6tVr/PZdo3eFJFIk1M+m8QJqXOZxb9uwKJ++1cvzlHWjyumKGl4k55WNT8/jzuWU+e6G7TWXYG6MNRYVxz2E1Ze3BSnYBz+yb7LaprLWvHz6UwSGQ0+XK9+X5HVsgBX21puu2LE8/4M8DeNvUjmwekg6E71qGHtvxzoTjHCJpZg+gOdmGPu9MT9stJ698TIqT86UXPx3oMCd2po1XUZ8h4XFT785KbRLQHLaxbdAvHLubljNmTfore1ppF6q4qu5ANrf92kOISh3W4qhEz9HUH4CDq3fTrB4V7O7D5Vtwj+tLybna1/c8ht5J49YMu2xMioGKYAUZl5TWv6PgrmN/cS6L+3TrnGZQoj2hQLwNEkUOZ0CT2npoC4yb0VnU4cD94F5aYj395Hwnftts1/QUqu6cMlEav33UO0R+pq/zVaZt9gD81C1y5jnIrVbrm6jFpwRVHwY0gIN11BffGYlFkzLMpZ+wfBLgB6ZPaaRyO0Q5K2rjHVt1HI3144VgSLgffJZoj//DRbIN9hsGOYc4sqmPrB1jT1kDLqR82lUb0XzemN6NyHiJBOFQ1ZJ0zobMAoki0rl3ihtGpgDsFCTeOigZKvAcUGbIrAsqsW54wgcMEpg+c/SUp9npiP47LN3alI03d3vqERD0XEitDWIgll7Sxjs2ZSSZfQO0hUwvRtdf5FMzOYdxjpwjBpc8kVEwYe3OZKcRZORhKerM8NjWE0eoAvWeLmwDM7nQkIg0nf3+9VkPdtCZdTv0iqHIl8wMZgG14yU0dyJT9MACAF8r8ruxebXOrv7Nn8CSKlGdXSbCJiLjKcmpU/n9zEEwjw9STpYLFOKe4Zd/+SSvOh2zrTxJ6XXWlwfvaSXIHZZJv9qoUkhW2zCUlg0C8p6QJJkQC5FP8PhBym8tEQALQoqgxkBe6WOOLADxjpvM7/we8CS6obF2WxP/TvbVYW4N1y+RBfgT6IGWm7MuHx/c4UH6zBSAw45Elc00LG16LHdnyqy3pbt79kMkhDTsbkXQxVqLiJWomhRxBr/bq2ucaYO+3U32ZuDBDtCBcEh5wxDekDP0au8LZhYwyKsfyXIATfmezrRbvsrOKzEN4JZomQjlqkvh42xGJ+BhfqSAduMgluLJULdCP946VtseJW08zBM6XLbcCWge2+Orx/7QHJjqTOKrNNg2rdR9ddo0kPa7fv/MEgE/bDwqGvfY8KR/eL/PH6f0h2HxnHgYMO+bf2XnLhGUYlCMR/q0O9UpwmZAGhHmUmQMZZiZfomIAXg1msOZEynBKM/cH0kNnljk/cBnV1yT/wo9tau9FR/uPk6NC8MsMROugHnPG1WQAB24iCUeB5h61Z04L7ubH+nEOh6P589zcIVyis+5mmF6dvqlDdBXzrlXsOEGdIxfC/abx6h/B9LV+1g9a4aVy1F3r7eWIIh0ga/vr5VSmW48jx+ySHkIhaJ3Jf0dNfNvksdiPVjsf6HGFCcnGIM1utODh8tXnsob+yBQsFZTKY6yi2/EEkpbBfMbj+yhLX1o3v7LfGJYnkTlePlbje4fndXFLxhheRo9UGCL5O7eyMTa94L5Haba32rOUkOxmU5D3VehzyrVNoOcDXU9YsD93lH3LaqBGWWAyT//LwH7/5CVfgNEr8suP/dvzecLAU00KB5JWtY3cRqgfVP5WDtjPUNBi6V4lT0d07slUemCuLkndpsjmstrxfuXZTTzxTr0FsKhRmqwfNTHvEGhqqbSbfb6VYt8Ndo365s20ycybM8vMzd/U8ro3w24IDC4r7BrHZ6poYEkX5WXhFC+HHkOhcOkHGpnLfhXRExUHj6x8B/fLgOu6kcQZryBvmkY9KPxyxfLVpi5RFVmnAdvgPve0yvGeKlNVK85eCbyS1H/VZHERB0iM7x3eJInpH0BSV3smK/kuPmmMdeGEdlzPgKWbTpoY3JapkHZrHlHz4td2qoNLSy/N66gqNtAwO3UYrjHZ8XQDy4f3aPa1on9sphEgN6QNTbSR7J0vhjL1tQC96Ccpeh4ECQkh2JEQuBG+9fuZR26OJSj4sHn8f6gdWg3CElLZ7+ICWYZMN+HNwA25nxN829nxIjuSx7ik5TkV2mrtl/4ZUujKgHMNMdWYIooNob5QWbfpyXVK8JnGpzmjqVw9U2uJQy6bC49QgpFymfOi7SkRzw5AfLFy2yzWNBiAaepYmPFev8zXkTg6+G1c8yntT6Z7RllLjUoW6Vf6Msr75HhvrdEBxZ19/wahmoUhz1mDiQvs5CSAkDZOSCUvWIgSRB0n2a9/WnpLFUVEPrHAicTq79yY659FGkN/UCRUonHh+gXGZCjXiXshZ6uySiIeH1vN/CHdUJx0znyK5sdwVezaEbenBEtuk1AWgZBwQBC5TSG9cj8Pi+ic0yLnvXhSvqz+A22g1xomTuyE+3tKnCAahlOcjb36pstHT+6am+GPDEt17gxDUxUBTglcuI+uc+koazE9ykuFM0CflklLQkXiZbdq5UePULz93JlUGo1QHGhgTSDNaNCqUyh6ryZoNGKWDYAM1N/zSsBEovkCSRO0W6vwO2hxMso4/bJXsapSmUBy1jte648zxtvjiYdVYJDMD+bqENQqZOABHcWOoE4kRN4pUkSLVMt1yTHJAO8eC0g4WpEfQkAq8vMbZRS9KO2yqDTovACeVDIn8hwlz9IchL/ph1OHbVEv4ajh25IS10CBKrYJZidE2TJT4dgN1tQKnRZOetXesYI+XGjuP9IyNc7X08Cnl8TSEBd0cmqMXTGZ31iInPEow4prJ7QPoHGLwUqvxB1rD4AmTeRayP/tU6yyvCen28gNWSkx9c7UgLBqWoMcFMRclJImbekU82kJEGobust34z6K/HeSikzZL8wWlPBmcSt2SSP+Axsh1l/itWbsHOHK+PKAvcoL19ddieWCfU7oxL9H13sCWI+8Q3YSqgZ9siz3a/tnDaENiK8vfFgc6dR8SkKyfsdBIAFIbfofOyG52+DyT3mKef3U53s6yTReUWJTUQ4KKB3hFdt4fZ2AYSgokS9TCT+5Nr1DRIi+l5mIBhViVtnpCRZgVXP+cdCw5Om93e4uV4tJl11QS1KabpYha9wsmtfrLAA2teRMKFYoL1rLNDoKo7AxMx8kYZGvnIpX6nSMGlRipv1HH2OTOHyiBUvU0I2z3/86La7hJHqqU7RP7mkxOfloacQlVk/352UAyttwkX/5t2C34ugHjPlDL25+WM3mpT/hhKTuAvp5ymoKCPgZyNx2Umkb4F/PHjcDdnBeeAx56KiPkjsCOF+hVXi/4QwFTzMCcEX/kopIcLAO/FMQg0xTHW/J7qT922O4iShPZlR4YabpmH32SxusLW7S2qlDNxdkXyxgUzkdiss2xPSpvlpPI0U1/B8rd0m0DPSmgWZoQlhj2LYbq8QQtu8DMeaQyjRY/KtiTSAAI1LEcWwoWfICqfej4j2ow05LhEhkESLZhfysT0uZf/R++AnuG9OjUWh6zs6dpksD0/U5rBboJ/luLALSwWzSeFHHicR5JfR2hGDpxuk+4qT78+1Y741MtJYR/9El9hrife9T47/Uv9Xsd4B/4Yb3qCheMJNZCEKbIabkhBQuHxSGTBboxp5kprwbfvco5V2W7qTMHPdtugArODmUqRxbOejB3Q4pH1TmBjSQkuoe0aug4o0UUjOZDKL5up25G605HEbp9CmWXKx8nsfNvgdqEOXtsLiL2haZr3cCMC9MMfWtnvva59z31XPHmip/LxQnEKuAQNChwqpDSAVlW2ahJbaahsXdX32G/eV1oxATt/Ahe66Bw4e5JCV5q0q/OpWt2R9cj2ujtQOgPH3iVCk9TpXT3gtF+dsI6PSC2g7Knc1n/HNMP8Gv8da5VgGXuWvZ+CPzh89486ZMRYEvXIyCR/5F3edGP50XtjCDdlhFN2dMf8yNZ/7//jzmID7Ah0b+VsQodZ6f8zHqQoX/dfWqixzKhYfi+WUWSedrHUUOgrtXXoEko/GhmODMNofTJxDB6gfrIOtd5uL7iVAsIO4FV78s0jGdUpQj6EB7Y3vzSKubZ9VAhv7Lf4aHDH2FL7OHbGYjqCIYcGgmiAZCTX5NHEB1Kj84O4e9Xj7rN2+ufx/FB9D8pSq0YJyJjG+EZMVValrp8rx3KrbscqS+bbfAk0RS+v8QiR/Su4f/wj6HPG+snwcwHpefvmSIb6iZvcUmnc1vWUHWdyVXvoWSwoV9dpr9W18WWJITVTk+ZLuAQQ1Bmg2US3BPn6Dose/NgAsFOyYxjhv+eZ1Va84rymnlhO4gJTkG+tPz43OWg0GoV2u+3h25iAd4QXluWPWVZndu1KtAl0zsRR9ywZ/Dy8ivOMbBuRQn4VnwJTK74b88UWVTOiZVdjg8yrNZepxUsxA+3qwDa4RV/R1yleF+0LBeCSwO2e0RTbchXZVmuQtfviccWZrfOvcnOUSsQ+wtuM3YqmAXu00zN/SzEUUML2SAFjqB4S8U17ZvxTK3OZv95j3f/W2/m7Ovlz0o23YCLZ/3Fa1vhXkUHos3x0MAIKe1TEytJII8QNiuPSREFRmKTCXyaXLtGnt7q/RjKjm2UAEmlTpQor0qePwE+o47PGj1Ku4wtpmwi6+ap/4Jq667MtlAk23fTngWONNlSGBTV3kFF+tB7mXNn04gokDykk5wpj9OASeBWCmYzDwS8t9dBd+c0W5zjKGtEAHzUdKx61PIBJCn8xoh06dOmz4KFeYmy0WD42A+kA1b7a3EZlqBOPRGMtfXYgieCCg5tW36Ap4wrE0jwj8V6vY5UABe7jB9XVyCvCRWrfEoJtl/PQr1r50P4iafivZZ7YUDbsvxgbZa6J4P06tK44mmdGrtS1rU/lgCqPuznS4eXblDsDnRBu/FKBJdTn9XE3H8vU+vGVd96d4MdQVp3am6AD1dCGVT0z7ZtIhGSeP2UsP01VXwmGEO5Y2NIn4RluSr+99ClLFjsKgUc8bT/cfOxhU4arr2QmbDVv3IHpuL/+6O88wDuRgCWMnQbezEnHOU7/VwPdl8SjGM7IRdYECOfyH58MXjf3Nhk9V4Uff+sqPp41oQjrmnbH4Iuu+qZr2CVMAxywtb8fvHz86PoByQx556BRQJ2csAyWe9S99pfDvRHWfnzxjvYNZaEzYCMeG6fGOM5dAcNmtrm9en+3yEKoQBQT1h1xpzk1nLpiBJPdzBfuRMaEZiGwK1INA37gefnumiemJNAi62TWoD4dsen5jtElCfUAK5JB9qLUebU3aHP88fW4Mx8HKmVesdPwZeL5VZ1x0liQP2BRmP08sGrPG029FabpLSX4b33VMtvO+fgfLJdFFE/JroCwulrZTZAK7cLpb0rnHckNgrl/gZ53dlJmiasDDdj447J8m/Qmvg/z+RQ3N9V1OjkU/EATgNnedlU+TVhOimTv6ynEUyA/0AxSFAxHYMO/5hkSkWdq28NS1x/nvopQEUAJbiDKZVc7CqYb9dT3ctC1pX8f8YiCI2dGA9itB44iaynIWhPZHkBL4xiDAxhbpAr2ZHVH+m/q8JygpsqyeW0SWS6EqtmJpVr60UCzCTOKtQ+i/dNC+Etj9ck6r+7+KIO4iVRAnEb7laqM7UQG8NE50Gca9CDI8PTNzQexGV/Ky8lmmO2ZFZT7IlAf+U2UzdZZkaQchbYkXtEiC0mi2sZcpNLgh6Fhta1RpEmA9buw3XVej1Hif1KcTfFl5/RcSxNzkttpOr8/pzSnwHZgRQwXf4r2I3s2hvnmNrbPWHdLqRsNxwHbFS220LOFC/AaTbbGC72nbuks8Bj0vDYzN8jB9fyiI3sruWHuG475P6uBYdCCYxAUZr3oXOZFFQ2hWgUbfmZqP5Ua/bb58U56M6B+PcCkBX97peHMD47gKDBLVBjNsUoT5xUqkuDVtPIFYuMQAoF+K2YshxLsfBH80s1mALvluoNLlp1ifaIuJgO8kxHjBvzLoUEV/NZ1/kyHPqYs+p0BHt6MLROFOpJK6OApSeBssu9ei4dCFYFCb4FzxCFsR/ombwmnopdAd7LDMBu2Zvx8ii3szc9TTUtBb55dQt6WQgAbV/FtzEJTpClNVKwpBa676OxrCWzAEgIgUstcSQKPpvyqYYp3SPRzMzfvMCvmnLGmFEki74ZjpXwLIAEnDGSpYVcqxvUq18PEPt0p+eQ/33IgGeV+N8Jab3D1WnWFKPFgrlP826Zm/Lqt3INp+VO0pAaY0MgCfSC3hEv5golvoEEZCmBGdom16YXq//zWSgAvVa2PEk1iDjasNOD1ZbUeLdhnFDCDHupekslxUR5UmcXXRgI1x2DZdU+GkU8W2oWQAuaLdunTSe/nBhTmMnSb4nIGEnBFDa++LMUQ0MHSiWaa8IvcEOvHIlLfkc1YyCeVs4QyILMQNzl+177emNqOQz7/9nWbOlVmR0LJUWb0gudesHiFtu4aWaZgENAs4vGDV3UgZnzlIVewWywf/gJ5/sGHKbS+uu7P4z61mvGGg1+zBBLGMNK/2Pfgv5w13ZMkni/lfD5516fSFJIe9pRTJT1GpjyCMQ2gp+pNi8Jer9t/FVDUzbBxeRiN7Ygu8DuicYXle7FeLpwBLNvjkAGHxKkg5ykp+u/Q9q80OGsEFYJTbRcnkuvK+mc55IziLrURlC4/45CZU2CYk8TRfMgCwYemaX4lugRcigBNvhflVqgnMPZcX6ZtXl1nHjJ2MD77SfIp7oG24SiSlGPKdX8V6yFZhjgVaRYyV4KAT8XrZjAhnf/P/1/WAlXm/Njjot+nUXAqqKygHU/T1bR1B+N586iWCzt9MQW9IfvIQ6IApNsMN6V3zAaR+hVmwYAdrLOpV5E5mP33RFD2KDq3wE1jSUwcOjy/VfnZuUVzwhodPG6PjKsd5JlRhx59WM9oh/Nm9BMTAjUQUgLLk7+YybenSJG7wou0xnDD/NTdbGsVwg8Q6e0NNEFAVUHvBsQWtAbxnyH6tHnXgdKz1JInT6gTDJBanqBH4IMLW9hrGs105p6mgT8oq3NszyFtEHJhH3KZiQ4V3Vbek8xFNXAAFAGz8qkgc2MqXV5MMKQ5tsgp5BsNVw2FUzfro5Ed9pR5oT/9QwHE4pN8TOr/yvzhLuSlGbREx8J/PbuTy2jXhBlgHK8nnmvEYQ4xCEUULujzlIFvMJBJUGDsUHB2a/aG1r0Rsxwv2+UAvbYUKihQbB+YXwdZboVU7MPlEw1ajwE/VHPbAXzrHQDL2Z89jQzo5QPBghdl/FVBSIxVx+AAAAAEHgAAA==") center / contain no-repeat; }
+  .marca-nome { font: 700 26px/1 var(--display); letter-spacing: -.035em; }
+  .faixa-topo { position: relative; }
+  .faixa-topo::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--degrade); }
+  .faixa-topo .marca { margin-bottom: 14px; }
+  .faixa-topo h1 .grad, .entrada-marca h1 .grad { background: var(--degrade); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .logo.mono { background: var(--degrade); }
+
+  /* ---------- tela de entrada ---------- */
+  .entrada { min-height: 100dvh; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); background: var(--fundo); }
+  .entrada-marca { position: relative; overflow: hidden; background: radial-gradient(120% 70% at 100% 0%, rgba(236, 106, 36, .22), transparent 60%), var(--marinho); color: var(--marinho-texto); padding: 40px clamp(24px, 5vw, 64px); display: flex; flex-direction: column; justify-content: space-between; gap: 48px; }
+  .entrada-marca .selo { font: 500 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--marinho-suave); }
+  .entrada-marca h1 { margin: 0; font: 700 clamp(40px, 6vw, 76px)/.95 var(--display); letter-spacing: -.04em; max-width: 9ch; }
+  .entrada-marca p { margin: 16px 0 0; max-width: 42ch; color: var(--marinho-suave); font-size: 16px; }
+
+  /* cena decorativa: bolinha descendo a escada */
+  .cena-box { display: flex; flex-direction: column; gap: 12px; }
+  .cena { position: relative; width: 280px; height: 170px; max-width: 100%; }
+  .degrau { position: absolute; bottom: 0; width: 56px; background: color-mix(in srgb, var(--marinho-texto) 7%, transparent); border-top: 1.5px solid color-mix(in srgb, var(--marinho-texto) 45%, transparent); }
+  .bola { position: absolute; left: -8px; top: 0; width: 16px; height: 16px; border-radius: 50%; background: var(--esfera); animation: escada 3.6s infinite; }
+  @keyframes escada {
+    0%   { transform: translate(20px, 4px); opacity: 0; animation-timing-function: ease-out; }
+    4%   { transform: translate(20px, 4px); opacity: 1; animation-timing-function: ease-out; }
+    10%  { transform: translate(48px, -18px); animation-timing-function: ease-in; }
+    18%  { transform: translate(76px, 34px); animation-timing-function: ease-out; }
+    26%  { transform: translate(104px, 12px); animation-timing-function: ease-in; }
+    34%  { transform: translate(132px, 64px); animation-timing-function: ease-out; }
+    42%  { transform: translate(160px, 42px); animation-timing-function: ease-in; }
+    50%  { transform: translate(188px, 94px); animation-timing-function: ease-out; }
+    58%  { transform: translate(216px, 72px); animation-timing-function: ease-in; }
+    66%  { transform: translate(244px, 124px) scale(1.15, .8); }
+    70%  { transform: translate(244px, 124px); opacity: 1; }
+    86%, 100% { transform: translate(244px, 124px); opacity: 0; }
+  }
+  .cena-legenda { font: 400 11.5px var(--mono); color: var(--marinho-suave); letter-spacing: .02em; }
+
+  .entrada-painel { display: grid; place-items: center; padding: 40px 20px; }
+  .entrada-cartao { width: min(420px, 100%); background: var(--cartao); border: 1px solid var(--linha); border-radius: 18px; box-shadow: var(--sombra); padding: 32px 28px; }
+  .entrada-form { display: flex; flex-direction: column; gap: 16px; }
+  .entrada-cartao h2 { margin: 0; font: 700 30px/1.1 var(--display); letter-spacing: -.025em; }
+  .entrada-cartao .sub { margin: 6px 0 4px; color: var(--grafite); font-size: 14.5px; }
+  .entrada-cartao .campo input { height: 44px; }
+  .senha-box { position: relative; }
+  .senha-box input { padding-right: 46px; }
+  .olho { position: absolute; top: 0; right: 0; width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: none; cursor: pointer; color: var(--grafite); border-radius: 10px; }
+  .olho:hover { color: var(--tinta); }
+  .olho svg { width: 18px; height: 18px; }
+  .lembrar { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--grafite); cursor: pointer; user-select: none; }
+  .lembrar input { width: 16px; height: 16px; accent-color: var(--azul); cursor: pointer; }
+  .entrada-carregando { display: flex; align-items: center; gap: 12px; color: var(--grafite); font-size: 14px; min-height: 120px; justify-content: center; }
+  .girando { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--linha-forte); border-top-color: var(--azul); animation: gira .8s linear infinite; flex: none; }
+  @keyframes gira { to { transform: rotate(360deg); } }
+  .btn-entrar { width: 100%; height: 48px; font-size: 15px; }
+  .btn-entrar .seta { display: inline-block; transition: transform .2s; }
+  .btn-entrar:hover .seta { transform: translateX(4px); }
+  .entrada-erro { margin: 0; padding: 11px 14px; border-radius: 10px; font-size: 14px; color: var(--perigo); background: color-mix(in srgb, var(--perigo) 9%, transparent); }
+  .entrada-nota { margin: 4px 0 0; padding-top: 16px; border-top: 1px solid var(--linha); font-size: 12.5px; color: var(--grafite); }
+  .entrada-aviso h2 { margin-bottom: 10px; }
+  .entrada-aviso p { margin: 0; color: var(--grafite); font-size: 14.5px; }
+
+  /* quem está conectado, no topo do acervo */
+  .sessao { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--marinho-suave); }
+  .sessao b { color: var(--marinho-texto); font-weight: 600; max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; vertical-align: bottom; }
+  .papel-tag { font: 500 10.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--marinho-texto) 30%, transparent); color: var(--marinho-texto); }
+  .sair { border: 0; background: none; padding: 2px 0; cursor: pointer; color: var(--marinho-suave); font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
+  .sair:hover { color: var(--marinho-texto); }
+
+  /* ---------- abas por app ---------- */
+  .faixa-topo.com-abas { padding-bottom: 0; }
+  .apps { max-width: 1240px; margin: 24px auto 0; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .apps::-webkit-scrollbar { display: none; }
+  .aba-app { flex: none; display: inline-flex; align-items: center; gap: 9px; height: 46px; padding: 0 16px; border: 0; border-radius: 12px 12px 0 0; background: transparent; color: var(--marinho-suave); cursor: pointer; font: 600 14.5px var(--texto); white-space: nowrap; }
+  .aba-app:hover { background: color-mix(in srgb, var(--marinho-texto) 9%, transparent); color: var(--marinho-texto); }
+  .aba-app[aria-selected="true"] { background: var(--fundo); color: var(--tinta); box-shadow: inset 0 3px 0 #ec6a24; }
+  .aba-app .n { font: 400 11.5px var(--mono); opacity: .7; font-variant-numeric: tabular-nums; }
+  .aba-app.nova { font-weight: 500; color: var(--marinho-suave); border: 1px dashed color-mix(in srgb, var(--marinho-texto) 30%, transparent); border-bottom: 0; }
+  .aba-app.nova:hover { color: var(--marinho-texto); }
+
+  /* ---------- acessos ---------- */
+  dialog.pequeno { width: min(560px, calc(100vw - 32px)); }
+  .contas { flex-shrink: 0; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border: 1px solid var(--linha); border-radius: 12px; overflow: hidden; }
+  .contas li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 14px; }
+  .contas li + li { border-top: 1px solid var(--linha); }
+  .contas .quem { display: flex; flex-direction: column; min-width: 0; }
+  .contas .quem b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .contas .quem span { font-size: 12.5px; color: var(--grafite); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .voce { font: 500 10.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--azul); flex: none; }
+  .link { border: 0; background: none; padding: 0; cursor: pointer; color: var(--azul); font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+  .link-voltar { align-self: flex-start; border: 0; background: none; padding: 4px 0; cursor: pointer; color: var(--grafite); font-size: 13.5px; }
+  .link-voltar:hover { color: var(--tinta); }
+  .entrada-cartao .campo textarea { min-height: 76px; }
+  .pedido-texto { width: 100%; min-height: 120px; resize: vertical; border: 1px solid var(--linha-forte); border-radius: 10px; background: var(--palco); padding: 10px 12px; font: 400 12.5px/1.55 var(--mono); color: var(--tinta); }
+  .st-selo { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; font: 500 11px var(--mono); letter-spacing: .05em; text-transform: uppercase; padding: 4px 9px; border-radius: 999px; border: 1px solid currentColor; }
+  .st-selo i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .st-selo.pendente { color: var(--fora); }
+  .st-selo.pendente i { animation: piscar 1.6s ease-in-out infinite; }
+  .st-selo.liberado { color: var(--no-ar); }
+  .st-selo.recusado { color: var(--perigo); }
+  @keyframes piscar { 50% { opacity: .25; } }
+  .st-liberado h2 { background: var(--degrade); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .ok-selo { display: inline-flex; align-items: center; gap: 6px; font: 500 11px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--no-ar); }
+  .convite { flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 12px; background: var(--azul-suave); }
+  .convite h3 { margin: 0; font: 600 16px var(--display); }
+  .badge { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; margin-left: 4px; border-radius: 999px; background: #ec6a24; color: #fff; font: 600 11px var(--mono); text-decoration: none; }
+  .contas li .acoes-li { display: flex; gap: 6px; flex: none; }
+  .sec-titulo { margin: 0; font: 600 12px var(--texto); letter-spacing: .1em; text-transform: uppercase; color: var(--grafite); }
+
+  @media (max-width: 820px) {
+    .entrada { grid-template-columns: 1fr; min-height: 0; }
+    .entrada-marca { padding: 28px 20px 32px; gap: 16px; }
+    .cena-box { display: none; }
+    .entrada-painel { padding: 24px 16px 48px; }
+    .entrada-cartao { padding: 24px 20px; }
+    .sessao { flex-wrap: wrap; }
+    .apps { margin-top: 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .bola { animation: none; transform: translate(20px, 4px); } .girando { animation-duration: 2.4s; } }
+</style>
+<style>
+  html, body { margin: 0; padding: 0; }
+  img { max-width: 100%; }
+</style>
+</head>
+<body>
+<section class="entrada" id="entrada" aria-labelledby="entrada-titulo">
+  <div class="entrada-marca">
+    <span class="marca"><span class="marca-simbolo" role="img" aria-label="Logo animasys"></span><span class="marca-nome">animasys</span></span>
+    <div>
+      <h1>Animações prontas para <span class="grad">levar.</span></h1>
+      <p>Entre para ver as animações de cada app rodando e copiar o código.</p>
+    </div>
+    <div class="cena-box" aria-hidden="true">
+      <div class="cena"><span class="degrau" style="left:0px;height:150px"></span><span class="degrau" style="left:56px;height:120px"></span><span class="degrau" style="left:112px;height:90px"></span><span class="degrau" style="left:168px;height:60px"></span><span class="degrau" style="left:224px;height:30px"></span><span class="bola"></span></div>
+      <span class="cena-legenda">bolinha descendo a escada · css</span>
+    </div>
+  </div>
+  <div class="entrada-painel">
+    <div class="entrada-cartao">
+      <div class="entrada-carregando" id="ent-carregando"><span class="girando"></span>Carregando…</div>
+
+      <form class="entrada-form" id="ent-login" novalidate hidden>
+        <div>
+          <h2 id="entrada-titulo">Entrar</h2>
+          <p class="sub">Use o seu e-mail e a sua senha do animasys.</p>
+        </div>
+        <div class="campo"><label for="login-email">E-mail</label><input id="login-email" type="email" autocomplete="username" placeholder="voce@empresa.com.br" maxlength="120"></div>
+        <div class="campo"><label for="login-senha">Senha</label><div class="senha-box"><input id="login-senha" type="password" autocomplete="current-password" placeholder="Sua senha" maxlength="200"><button class="olho" type="button" data-olho aria-label="Mostrar senha"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M1.5 10S4.5 4 10 4s8.5 6 8.5 6-3 6-8.5 6S1.5 10 1.5 10Z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button></div></div>
+        <p class="entrada-erro" id="login-erro" role="alert" hidden></p>
+        <button class="btn btn-pri btn-entrar" type="submit" id="login-btn">Entrar <span class="seta" aria-hidden="true">→</span></button>
+        <button type="button" class="link-voltar" data-ir="esqueci">Esqueci minha senha</button>
+        <p class="entrada-nota">O animasys é só para convidados. Não tem acesso? <button type="button" class="link" data-ir="pedido">Pedir convite</button></p>
+      </form>
+
+      <form class="entrada-form" id="ent-pedido" novalidate hidden>
+        <div>
+          <h2>Pedir convite</h2>
+          <p class="sub">Mande o seu pedido. Quando o administrador liberar, você entra com este e-mail e esta senha.</p>
+        </div>
+        <div class="campo"><label for="ped-nome">Nome</label><input id="ped-nome" autocomplete="name" maxlength="60" placeholder="Seu nome"></div>
+        <div class="campo"><label for="ped-email">E-mail</label><input id="ped-email" type="email" autocomplete="email" maxlength="120" placeholder="voce@empresa.com.br"></div>
+        <div class="campo"><label for="ped-senha">Crie uma senha</label><div class="senha-box"><input id="ped-senha" type="password" autocomplete="new-password" maxlength="200" placeholder="Pelo menos 8 caracteres"><button class="olho" type="button" data-olho aria-label="Mostrar senha"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M1.5 10S4.5 4 10 4s8.5 6 8.5 6-3 6-8.5 6S1.5 10 1.5 10Z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button></div></div>
+        <div class="campo"><label for="ped-senha2">Repita a senha</label><input id="ped-senha2" type="password" autocomplete="new-password" maxlength="200"></div>
+        <div class="campo"><label for="ped-msg">Mensagem <span class="dica">(opcional)</span></label><textarea id="ped-msg" maxlength="500" placeholder="Para qual app você precisa das animações?"></textarea></div>
+        <p class="entrada-erro" id="ped-erro" role="alert" hidden></p>
+        <button class="btn btn-pri btn-entrar" type="submit" id="ped-btn">Enviar pedido <span class="seta" aria-hidden="true">→</span></button>
+        <button type="button" class="link-voltar" data-ir="login">← Já tenho acesso</button>
+      </form>
+
+      <div class="entrada-form" id="ent-confirme" hidden>
+        <span class="st-selo pendente"><i></i><span>Falta confirmar o e-mail</span></span>
+        <div>
+          <h2>Confirme o seu e-mail</h2>
+          <p class="sub">Enviamos um link para <b id="conf-email"></b>. Clique nele para confirmar. Aí o pedido chega ao administrador.</p>
+        </div>
+        <p class="dica" id="conf-msg" role="status" style="margin:0"></p>
+        <button class="btn" type="button" id="conf-reenviar">Reenviar o e-mail</button>
+        <button type="button" class="link-voltar" data-ir="login">← Voltar para o login</button>
+      </div>
+
+      <div class="entrada-form" id="ent-status" hidden>
+        <span class="st-selo" id="st-selo"><i></i><span id="st-selo-txt"></span></span>
+        <div>
+          <h2 id="st-titulo"></h2>
+          <p class="sub" id="st-texto"></p>
+        </div>
+        <button class="btn btn-pri btn-entrar" type="button" id="st-entrar" hidden>Entrar agora <span class="seta" aria-hidden="true">→</span></button>
+        <button type="button" class="link-voltar" id="st-sair">Sair desta conta</button>
+      </div>
+
+      <form class="entrada-form" id="ent-esqueci" novalidate hidden>
+        <div>
+          <h2>Esqueci minha senha</h2>
+          <p class="sub">Mandamos um link para você criar uma senha nova.</p>
+        </div>
+        <div class="campo"><label for="esq-email">E-mail</label><input id="esq-email" type="email" autocomplete="email" maxlength="120" placeholder="voce@empresa.com.br"></div>
+        <p class="entrada-erro" id="esq-erro" role="alert" hidden></p>
+        <p class="dica" id="esq-ok" role="status" hidden style="margin:0"></p>
+        <button class="btn btn-pri btn-entrar" type="submit" id="esq-btn">Enviar link <span class="seta" aria-hidden="true">→</span></button>
+        <button type="button" class="link-voltar" data-ir="login">← Voltar para o login</button>
+      </form>
+
+      <form class="entrada-form" id="ent-nova-senha" novalidate hidden>
+        <div>
+          <h2>Crie uma senha nova</h2>
+          <p class="sub">Depois de salvar, você já entra com ela.</p>
+        </div>
+        <div class="campo"><label for="nova-senha">Senha nova</label><div class="senha-box"><input id="nova-senha" type="password" autocomplete="new-password" maxlength="200" placeholder="Pelo menos 8 caracteres"><button class="olho" type="button" data-olho aria-label="Mostrar senha"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M1.5 10S4.5 4 10 4s8.5 6 8.5 6-3 6-8.5 6S1.5 10 1.5 10Z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button></div></div>
+        <div class="campo"><label for="nova-senha2">Repita a senha</label><input id="nova-senha2" type="password" autocomplete="new-password" maxlength="200"></div>
+        <p class="entrada-erro" id="nova-erro" role="alert" hidden></p>
+        <button class="btn btn-pri btn-entrar" type="submit" id="nova-btn">Salvar e entrar <span class="seta" aria-hidden="true">→</span></button>
+      </form>
+
+      <div class="entrada-aviso" id="ent-aviso" hidden>
+        <h2>animasys</h2>
+        <p id="ent-aviso-txt"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="app" hidden>
+<header class="faixa-topo com-abas">
+  <div class="faixa-in">
+    <div>
+      <span class="marca"><span class="marca-simbolo" role="img" aria-label="Logo animasys"></span><span class="marca-nome">animasys</span></span>
+      <h1>Acervo de <span class="grad">animações</span></h1>
+      <p>Animações em HTML e CSS, separadas por app. Abra uma, veja rodando e copie o código para levar ao sistema real.</p>
+    </div>
+    <div class="faixa-acoes">
+      <div class="sessao" id="sessao" hidden><span>Conectado como <b id="sessao-nome"></b></span><span class="papel-tag" id="sessao-papel"></span><button class="sair" type="button" id="btn-acessos" hidden>Acessos<span class="badge" id="n-pedidos" hidden></span></button><button class="sair" type="button" id="btn-sair">Sair</button></div>
+      <div class="contagem" id="contagem">carregando o acervo…</div>
+      <button class="btn btn-claro" id="btn-nova" type="button" hidden>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Adicionar animação
+      </button>
+    </div>
+  </div>
+  <div class="apps" id="apps" role="tablist" aria-label="Apps"></div>
+</header>
+
+<div class="corpo">
+  <nav class="lateral" aria-label="Seções">
+    <h2>Seções</h2>
+    <div id="nav-sistemas" style="display:contents"></div>
+    <div class="sep"></div>
+    <button class="nav-item fora-nav" type="button" id="nav-fora"><span class="nome"><span class="ponto" style="display:inline-block;margin-right:8px"></span>Fora do ar</span><span class="n" id="n-fora">0</span></button>
+  </nav>
+
+  <main class="principal">
+    <div class="ferramentas">
+      <h2 id="titulo-vista">Todas as animações</h2>
+      <label class="busca">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10.5 10.5 14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <input id="busca" type="search" placeholder="Buscar por nome ou característica" aria-label="Buscar animações">
+      </label>
+    </div>
+    <div id="aviso" class="aviso-geral" hidden></div>
+    <div id="lista" class="principal"></div>
+  </main>
+</div>
+</div>
+
+<!-- detalhe -->
+<dialog id="detalhe" aria-labelledby="det-titulo">
+  <div class="dlg">
+    <div class="dlg-cab">
+      <div><h2 id="det-titulo"></h2><p id="det-desc"></p></div>
+      <button class="fechar" type="button" data-fechar aria-label="Fechar"><svg viewBox="0 0 16 16"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="dlg-corpo">
+      <div class="passos" id="det-passos"><span class="passo" data-p="1">1 · Na página</span><span aria-hidden="true">→</span><span class="passo" data-p="2">2 · Só a animação</span></div>
+      <div id="det-v1" style="display:flex;flex-direction:column;gap:14px">
+        <div class="palco pagina grande" id="det-pagina"></div>
+        <div class="barra-continuar">
+          <p>Assim a animação aparece na página. Gostou? Continue para pegar só o código dela.</p>
+          <button class="btn btn-pri btn-continuar" type="button" id="det-continuar">Continuar <span class="seta" aria-hidden="true">→</span></button>
+        </div>
+      </div>
+      <div id="det-v2" style="display:flex;flex-direction:column;gap:16px">
+        <div class="palco grande" id="det-palco"></div>
+        <div class="det-meta" id="det-meta"></div>
+        <div>
+          <div class="abas" role="tablist" id="det-abas"></div>
+          <pre class="codigo" id="det-pre"></pre>
+        </div>
+        <div class="copias">
+          <button class="btn" type="button" data-copiar="html" id="copiar-html">Copiar HTML</button>
+          <button class="btn" type="button" data-copiar="css">Copiar CSS</button>
+          <button class="btn" type="button" data-copiar="js" id="copiar-js">Copiar JS</button>
+          <button class="btn btn-pri" type="button" data-copiar="tudo">Copiar arquivo de teste completo</button>
+        </div>
+        <p class="dica" id="det-dica-base" hidden>A pré-visualização usa uma estrutura de teste (cabeçalho, produtos) com as mesmas classes do sistema. Ela não precisa ser copiada: no sistema real, cole só o HTML, o CSS e o JS acima.</p>
+      </div>
+    </div>
+    <div class="dlg-rodape">
+      <div class="acoes">
+        <button class="btn" type="button" id="det-voltar" hidden>← Ver na página</button>
+        <button class="btn" type="button" id="det-reiniciar">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.6-3.7M3 2.5v3h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Reiniciar
+        </button>
+      </div>
+      <div class="acoes" id="det-acoes"></div>
+    </div>
+  </div>
+</dialog>
+
+<!-- adicionar / editar -->
+<dialog id="form-dlg" aria-labelledby="form-titulo">
+  <form class="dlg" id="form" novalidate>
+    <div class="dlg-cab">
+      <div><h2 id="form-titulo">Adicionar animação</h2><p id="form-sub">Ela entra no ar assim que você salvar.</p></div>
+      <button class="fechar" type="button" data-fechar aria-label="Fechar"><svg viewBox="0 0 16 16"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="dlg-corpo">
+      <div class="campos">
+        <div class="campo"><label for="f-nome">Nome</label><input id="f-nome" maxlength="80" placeholder="Ex.: Bolinha descendo a escada"><small>Descreva a característica principal.</small></div>
+        <div class="campo"><label for="f-sistema">App, site ou sistema</label><input id="f-sistema" maxlength="40" list="lista-sistemas" placeholder="Ex.: Site IPC"><datalist id="lista-sistemas"></datalist></div>
+        <div class="campo"><label for="f-secao">Seção</label><input id="f-secao" maxlength="40" list="lista-secoes" placeholder="Ex.: Datas comemorativas"><datalist id="lista-secoes"></datalist><small>Onde ela fica dentro do sistema.</small></div>
+        <div class="campo"><label for="f-tags">Características</label><input id="f-tags" maxlength="80" placeholder="natal, neve"><small>Até 3, separadas por vírgula.</small></div>
+        <div class="campo largo"><label for="f-desc">Descrição</label><textarea id="f-desc" maxlength="400" placeholder="O que acontece e onde ela entra no sistema."></textarea></div>
+      </div>
+      <div class="cod-grade">
+        <div class="campo"><label for="f-html">HTML</label><textarea class="cod" id="f-html" spellcheck="false" placeholder="<div class=&quot;bola&quot;></div>"></textarea></div>
+        <div class="campo"><label for="f-css">CSS</label><textarea class="cod" id="f-css" spellcheck="false" placeholder=".bola { animation: pula 1s infinite; }"></textarea></div>
+      </div>
+      <details class="js" id="f-js-box">
+        <summary>JavaScript (opcional)</summary>
+        <div class="campo"><label for="f-js" class="dica">Só se a animação precisar.</label><textarea class="cod" id="f-js" spellcheck="false"></textarea></div>
+      </details>
+      <details class="js" id="f-pagina-box">
+        <summary>Página completa para mostrar a animação no lugar (opcional)</summary>
+        <div class="campo"><label for="f-pagina" class="dica">Cole o HTML inteiro da página já com a animação. Ela aparece no passo "Na página", antes do código.</label><textarea class="cod" id="f-pagina" spellcheck="false" placeholder="<!doctype html>…"></textarea></div>
+        <p class="dica" id="f-pagina-pub" hidden></p>
+      </details>
+      <div class="campo"><span class="rot">Pré-visualização</span><div class="palco grande" id="f-palco"></div></div>
+      <p class="erro" id="f-erro" role="alert" hidden></p>
+    </div>
+    <div class="dlg-rodape">
+      <span class="dica">O código roda isolado, sem acesso ao resto da página.</span>
+      <button class="btn btn-pri" type="submit" id="f-salvar">Salvar e colocar no ar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- novo app -->
+<dialog id="app-dlg" class="pequeno" aria-labelledby="app-titulo">
+  <form class="dlg" id="app-form" novalidate>
+    <div class="dlg-cab">
+      <div><h2 id="app-titulo">Novo app</h2><p>Cria uma aba nova. As animações desse app ficam separadas nela.</p></div>
+      <button class="fechar" type="button" data-fechar aria-label="Fechar"><svg viewBox="0 0 16 16"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="dlg-corpo">
+      <div class="campo"><label for="app-nome">Nome do app, site ou sistema</label><input id="app-nome" maxlength="40" placeholder="Ex.: App de entregas"></div>
+      <p class="erro" id="app-erro" role="alert" hidden></p>
+    </div>
+    <div class="dlg-rodape"><span class="dica">Depois dá para colocar o logo dele.</span><button class="btn btn-pri" type="submit" id="app-salvar">Criar aba</button></div>
+  </form>
+</dialog>
+
+<!-- acessos -->
+<dialog id="acessos-dlg" class="pequeno" aria-labelledby="acessos-titulo">
+  <div class="dlg">
+    <div class="dlg-cab">
+      <div><h2 id="acessos-titulo">Acessos</h2><p>Só entra quem você liberar. Cada pedido também chega por e-mail em jnautomacoes@gmail.com.</p></div>
+      <button class="fechar" type="button" data-fechar aria-label="Fechar"><svg viewBox="0 0 16 16"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="dlg-corpo">
+      <h3 class="sec-titulo">Pedidos de convite</h3>
+      <ul class="contas" id="lista-pendentes"></ul>
+      <h3 class="sec-titulo">Quem tem acesso</h3>
+      <ul class="contas" id="lista-liberados"></ul>
+      <div id="box-fora" hidden style="display:flex;flex-direction:column;gap:10px">
+        <h3 class="sec-titulo">Recusados e removidos</h3>
+        <ul class="contas" id="lista-fora"></ul>
+      </div>
+    </div>
+    <div class="dlg-rodape"><span class="dica">Para convidar alguém, mande o link do animasys. A pessoa pede o convite e você libera aqui.</span></div>
+  </div>
+</dialog>
+
+<input type="file" id="logo-arquivo" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="vendor/supabase-2.117.2.js"></script>
+<script src="config.js"></script>
+<script>
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var el = function (tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+  var SEM_SISTEMA = 'Sem sistema';
+
+  // só a conta de administrador adiciona e edita; os demais só veem e copiam as animações
+  var ADMIN_EMAIL = 'joaogvalim@gmail.com';
+  var st = { db: null, podeEscrever: false, admin: false, podeDb: null, itens: [], sistemas: {}, app: null, vista: 'todos', tag: null, busca: '' };
+  function aplicarPapel() {
+    st.podeEscrever = st.admin && !!st.db && st.podeDb !== false;
+    $('#btn-nova').hidden = !st.podeEscrever;
+    if (!st.podeEscrever && st.vista === 'fora') st.vista = 'todos';
+    render();
+  }
+
+  /* ---------- logos dos sistemas (coleção "sistemas", um doc por sistema) ---------- */
+  function slug(n) { return (n || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'sem-sistema'; }
+  function logoEl(nome, grande) {
+    var s = st.sistemas[slug(nome)], span = el('span', 'logo' + (grande ? ' g' : ''));
+    if (s && s.logo) { var i = new Image(); i.alt = ''; i.src = s.logo; span.appendChild(i); }
+    else { span.classList.add('mono'); span.textContent = (nome || '?').trim().charAt(0).toUpperCase(); }
+    span.setAttribute('aria-hidden', 'true');
+    return span;
+  }
+  var logoPara = null;
+  function pedirLogo(nome) { logoPara = nome; var i = document.getElementById('logo-arquivo'); i.value = ''; i.click(); }
+  function reduzir(arquivo) {
+    return new Promise(function (ok, falha) {
+      var url = URL.createObjectURL(arquivo), img = new Image();
+      img.onload = function () {
+        var w = img.naturalWidth || 240, h = img.naturalHeight || 120, k = Math.min(1, 120 / h, 360 / w);
+        var c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        try { ok(c.toDataURL('image/png')); } catch (e) { falha(e); }
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); falha(new Error('imagem')); };
+      img.src = url;
+    });
+  }
+  document.getElementById('logo-arquivo').addEventListener('change', async function () {
+    var f = this.files[0], nome = logoPara; if (!f || !nome) return;
+    if (f.size > 5 * 1048576) { toast('Imagem grande demais. Use um logo com menos de 5 MB.'); return; }
+    try {
+      var dado = await reduzir(f);
+      if (dado.length > 180000) { toast('O logo ficou pesado demais. Tente um PNG mais simples.'); return; }
+      await st.db.doc('sistemas/' + slug(nome)).set({ nome: nome, logo: dado, atualizadoEm: Date.now() });
+      toast('Logo de ' + nome + ' atualizado');
+    } catch (e) { toast(e && e.code ? msgErro(e) : 'Não foi possível ler essa imagem. Use PNG, JPG, WebP ou SVG.'); }
+  });
+  var cards = new Map(); // id → { el, chave }
+
+  var toastT;
+  function toast(m) { var t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('on'); }, 2600); }
+  function aviso(m) { var a = $('#aviso'); a.hidden = !m; a.textContent = m || ''; }
+  function sistemaDe(it) { return (it.sistema || '').trim() || SEM_SISTEMA; }
+  function noAr(it) { return it.noAr !== false; }
+  function porNome(a, b) { return (a.titulo || '').localeCompare(b.titulo || '', 'pt', { sensitivity: 'base' }); }
+
+  /* ---------- palco: roda o HTML/CSS isolado num iframe ---------- */
+  var vigias = new Map();
+  addEventListener('message', function (e) {
+    if (!e.data || e.data.acervo !== 1) return;
+    var p = vigias.get(e.source); if (p) { p.dataset.ok = '1'; var a = $('.aviso-palco', p); if (a) a.remove(); }
+  });
+  // a estrutura de teste (baseHtml) recebe a animação no marcador <!--ANIMACAO-->; sem marcador, ela vem depois
+  function corpoDe(it) {
+    var b = it.baseHtml || '', h = it.html || '';
+    return b.indexOf('<!--ANIMACAO-->') >= 0 ? b.replace('<!--ANIMACAO-->', h) : b + (b && h ? '\n' : '') + h;
+  }
+  function arquivoCompleto(it, comSinal) {
+    var js = String(it.js || '').replace(/<\/script/gi, '<\\/script');
+    var css = ((it.baseCss ? it.baseCss + '\n\n/* ===== animação ===== */\n' : '') + (it.css || '')).replace(/<\/style/gi, '<\\/style');
+    return '<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
+      '<title>' + (it.titulo || 'Animação').replace(/</g, '&lt;') + '</title>\n<style>\n' + css + '\n</style>\n</head>\n<body>\n' + corpoDe(it) + '\n' +
+      (comSinal ? '<script>try{parent.postMessage({acervo:1},"*")}catch(e){}<\/script>\n' : '') +
+      (js.trim() ? '<script>\n' + js + '\n<\/script>\n' : '') + '</body>\n</html>\n';
+  }
+  var medidor = new ResizeObserver(function (es) { es.forEach(function (e) { e.target.style.setProperty('--k', (e.contentRect.width / 960).toFixed(4)); }); });
+  function montar(palco, it, mini) {
+    desmontar(palco);
+    if (!((it.html || '') + (it.css || '') + (it.js || '') + (it.baseHtml || '')).trim()) { palco.appendChild(el('div', 'aviso-palco', 'Cole o HTML e o CSS e a animação aparece aqui.')); return; }
+    var f = document.createElement('iframe');
+    f.setAttribute('sandbox', 'allow-scripts');
+    f.setAttribute('title', it.titulo || 'Animação');
+    if (mini) { f.className = 'mini'; f.setAttribute('tabindex', '-1'); medidor.observe(palco); }
+    f.srcdoc = arquivoCompleto(it, true).replace('<style>\n', '<style>\nhtml,body{margin:0;min-height:100%}\n');
+    palco.appendChild(f);
+    vigias.set(f.contentWindow, palco);
+    setTimeout(function () {
+      if (!palco.dataset.ok && palco.contains(f)) palco.appendChild(el('div', 'aviso-palco', 'A pré-visualização não carregou nesta visualização. O código continua disponível para copiar.'));
+    }, 5000);
+  }
+  function desmontar(palco) {
+    var f = $('iframe', palco); if (f) vigias.delete(f.contentWindow);
+    medidor.unobserve(palco);
+    palco.innerHTML = ''; delete palco.dataset.ok;
+  }
+  // passo 1: a página completa (arquivo publicado junto do acervo, ou HTML colado no formulário)
+  function temPagina(it) { return !!(it.pagina || (it.paginaHtml || '').trim()); }
+  function montarPagina(box, it) {
+    desmontar(box);
+    var f = document.createElement('iframe');
+    f.setAttribute('title', 'Página com a animação: ' + (it.titulo || ''));
+    if (it.pagina) {
+      f.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+      f.addEventListener('load', function () {
+        var ok = false;
+        try { ok = !!(f.contentDocument && f.contentDocument.body && f.contentDocument.body.childElementCount); } catch (e) {}
+        if (!ok && box.contains(f)) box.appendChild(el('div', 'aviso-palco', 'A página não abriu nesta visualização. Clique em Continuar para ver a animação isolada.'));
+      });
+      f.src = it.pagina;
+    } else {
+      f.setAttribute('sandbox', 'allow-scripts');
+      f.srcdoc = it.paginaHtml;
+    }
+    box.appendChild(f);
+  }
+  /* ---------- organização: sistema → seção → animação ---------- */
+  var SEM_SECAO = 'Outras';
+  var TEM_HOVER = matchMedia('(hover: hover)').matches;
+  function secaoDe(it) { return (it.secao || '').trim() || SEM_SECAO; }
+  function porOrdem(a, b) { return (a.ordem || 99) - (b.ordem || 99) || porNome(a, b); }
+  function sistemasOrdenados(lista) {
+    return Array.from(new Set(lista.map(sistemaDe))).sort(function (a, b) { return a === SEM_SISTEMA ? 1 : b === SEM_SISTEMA ? -1 : a.localeCompare(b, 'pt'); });
+  }
+  function secoesDe(lista, sistema) {
+    var m = {};
+    lista.forEach(function (it) { if (sistemaDe(it) !== sistema) return; var s = secaoDe(it); m[s] = Math.min(m[s] || 99, it.secaoOrdem || 99); });
+    return Object.keys(m).sort(function (a, b) { return m[a] - m[b] || a.localeCompare(b, 'pt'); });
+  }
+  // app: a aba aberta. vista dentro do app: 'todos' | 'fora' | 'c|<sistema>|<seção>'
+  function vistaInfo() { var p = st.vista.split('|'); return { tipo: p[0], sistema: p[1], secao: p[2] }; }
+
+  /* ---------- filtros ---------- */
+  function daVista() {
+    var v = vistaInfo();
+    return st.itens.filter(function (it) {
+      if (sistemaDe(it) !== st.app) return false;
+      if (st.vista === 'fora') return !noAr(it);
+      if (!noAr(it)) return false;
+      if (v.tipo === 'c') return secaoDe(it) === v.secao;
+      return true;
+    });
+  }
+  function filtrados(base) {
+    var q = st.busca.trim().toLowerCase();
+    if (!q) return base;
+    return base.filter(function (it) {
+      return [it.titulo, it.descricao, it.sistema, it.secao].concat(it.tags || []).join(' ').toLowerCase().indexOf(q) >= 0;
+    });
+  }
+
+  /* ---------- abas por app ---------- */
+  var CHAVE_APP = 'acervo-app';
+  function appsLista() {
+    var nomes = st.itens.map(sistemaDe);
+    Object.keys(st.sistemas).forEach(function (k) { if (st.sistemas[k].nome) nomes.push(st.sistemas[k].nome); });
+    var vistos = {}, lista = [];
+    nomes.forEach(function (n) { var k = slug(n); if (!vistos[k]) { vistos[k] = 1; lista.push(n); } });
+    return lista.sort(function (a, b) { return a === SEM_SISTEMA ? 1 : b === SEM_SISTEMA ? -1 : a.localeCompare(b, 'pt'); });
+  }
+  function abrirApp(nome) {
+    st.app = nome; st.vista = 'todos'; st.busca = ''; $('#busca').value = '';
+    try { localStorage.setItem(CHAVE_APP, nome); } catch (e) {}
+    render();
+  }
+  function renderAbas(apps) {
+    var box = $('#apps'); box.innerHTML = '';
+    apps.forEach(function (a) {
+      var b = el('button', 'aba-app'); b.type = 'button'; b.setAttribute('role', 'tab');
+      b.setAttribute('aria-selected', a === st.app);
+      b.appendChild(logoEl(a));
+      b.appendChild(el('span', null, a));
+      b.appendChild(el('span', 'n', String(st.itens.filter(function (it) { return noAr(it) && sistemaDe(it) === a; }).length)));
+      b.onclick = function () { abrirApp(a); };
+      box.appendChild(b);
+    });
+    if (st.podeEscrever && st.db) {
+      var nova = el('button', 'aba-app nova', '+ Novo app'); nova.type = 'button';
+      nova.onclick = abrirNovoApp;
+      box.appendChild(nova);
+    }
+    var ativa = $('.aba-app[aria-selected="true"]', box);
+    if (ativa && ativa.scrollIntoView && box.scrollWidth > box.clientWidth) ativa.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }
+
+  /* ---------- barra lateral: seções do app aberto ---------- */
+  function navBotao(chave, rotulo, n, sub, sistema) {
+    var b = el('button', 'nav-item' + (sub ? ' sub' : '')); b.type = 'button';
+    var esq = el('span', 'esq');
+    if (sistema) esq.appendChild(logoEl(sistema));
+    esq.appendChild(el('span', 'nome', rotulo));
+    b.appendChild(esq); b.appendChild(el('span', 'n', String(n)));
+    b.setAttribute('aria-current', st.vista === chave);
+    b.onclick = function () { st.vista = chave; st.busca = ''; $('#busca').value = ''; render(); };
+    return b;
+  }
+  function renderNav() {
+    var apps = appsLista();
+    if (apps.indexOf(st.app) < 0) {
+      var salvo = null; try { salvo = localStorage.getItem(CHAVE_APP); } catch (e) {}
+      st.app = apps.indexOf(salvo) >= 0 ? salvo : (apps[0] || null);
+      st.vista = 'todos';
+    }
+    renderAbas(apps);
+    var noArLista = st.itens.filter(noAr);
+    var doApp = st.itens.filter(function (it) { return sistemaDe(it) === st.app; });
+    var noArApp = doApp.filter(noAr);
+    var box = $('#nav-sistemas'); box.innerHTML = '';
+    box.appendChild(navBotao('todos', 'Todas', noArApp.length));
+    secoesDe(noArApp, st.app).forEach(function (sec) {
+      box.appendChild(navBotao('c|' + st.app + '|' + sec, sec, noArApp.filter(function (it) { return secaoDe(it) === sec; }).length));
+    });
+    var foraApp = doApp.length - noArApp.length;
+    $('#n-fora').textContent = foraApp;
+    $('#nav-fora').setAttribute('aria-current', st.vista === 'fora');
+    $('#nav-fora').hidden = !st.podeEscrever || (!foraApp && st.vista !== 'fora');
+    var fora = st.itens.length - noArLista.length;
+    var dl = $('#lista-sistemas'); dl.innerHTML = '';
+    sistemasOrdenados(st.itens).filter(function (s) { return s !== SEM_SISTEMA; }).forEach(function (s) { var o = el('option'); o.value = s; dl.appendChild(o); });
+    var ds = $('#lista-secoes'); ds.innerHTML = '';
+    Array.from(new Set(st.itens.map(secaoDe))).filter(function (s) { return s !== SEM_SECAO; }).sort().forEach(function (s) { var o = el('option'); o.value = s; ds.appendChild(o); });
+    var nSis = appsLista().length;
+    var c = $('#contagem'); c.innerHTML = '';
+    c.appendChild(el('b', null, String(noArLista.length))); c.appendChild(document.createTextNode(' no ar · '));
+    c.appendChild(el('b', null, String(nSis))); c.appendChild(document.createTextNode(nSis === 1 ? ' app' : ' apps'));
+    if (fora && st.podeEscrever) { c.appendChild(document.createTextNode(' · ')); c.appendChild(el('b', null, String(fora))); c.appendChild(document.createTextNode(' fora do ar')); }
+  }
+
+  /* ---------- cards: capa parada; a animação toca ao passar o mouse ---------- */
+  function chaveDe(it) { return JSON.stringify([it.titulo, it.descricao, it.tags, it.sistema, it.secao, it.ordem, it.html, it.css, it.js, it.baseHtml, it.baseCss, it.pagina, it.paginaHtml, noAr(it)]); }
+  function montarCapa(p, it) {
+    desmontar(p);
+    p.classList.add('capa');
+    var cap = el('div', 'capa-in');
+    cap.appendChild(logoEl(sistemaDe(it), true));
+    cap.appendChild(el('span', 'capa-secao', secaoDe(it)));
+    cap.appendChild(el('span', 'capa-dica', TEM_HOVER ? '▶ Passe o mouse para ver' : 'Toque para abrir'));
+    p.appendChild(cap);
+  }
+  function criarCard(it) {
+    var c = el('button', 'card' + (noAr(it) ? '' : ' fora')); c.type = 'button';
+    var p = el('div', 'palco'); p.dataset.id = it.id; c.appendChild(p);
+    montarCapa(p, it);
+    var info = el('div', 'card-info');
+    var l = el('div', 'card-linha');
+    l.appendChild(el('h4', null, it.titulo || 'Sem nome'));
+    if (!noAr(it)) { var s = el('span', 'status fora'); s.appendChild(el('i')); s.appendChild(document.createTextNode('Fora do ar')); l.appendChild(s); }
+    info.appendChild(l);
+    if (it.descricao) info.appendChild(el('p', null, it.descricao));
+    if ((it.tags || []).length) { var tg = el('div', 'tags'); it.tags.slice(0, 3).forEach(function (t) { tg.appendChild(el('span', 'tag', t)); }); info.appendChild(tg); }
+    c.appendChild(info);
+    if (TEM_HOVER) {
+      var entra = function () { clearTimeout(p._t); if (!$('iframe', p)) { p.classList.remove('capa'); montar(p, it, true); } };
+      var sai = function () { clearTimeout(p._t); p._t = setTimeout(function () { montarCapa(p, it); }, 200); };
+      c.addEventListener('mouseenter', entra); c.addEventListener('mouseleave', sai);
+      c.addEventListener('focus', entra); c.addEventListener('blur', sai);
+    }
+    c.onclick = function () { abrir(it.id); };
+    return c;
+  }
+
+  function render() {
+    renderNav();
+    var lista = filtrados(daVista()), v = vistaInfo();
+    $('#titulo-vista').textContent = !st.app ? 'Todas as animações' : st.vista === 'fora' ? st.app + ' › Fora do ar' : v.tipo === 'c' ? st.app + ' › ' + v.secao : st.app;
+
+    // cards reaproveitados: só recria o que mudou
+    var vivos = new Set(st.itens.map(function (i) { return i.id; }));
+    cards.forEach(function (x, id) { if (!vivos.has(id)) { desmontar($('.palco', x.el)); cards.delete(id); } });
+    st.itens.forEach(function (it) {
+      var k = chaveDe(it), a = cards.get(it.id);
+      if (!a || a.chave !== k) { if (a) desmontar($('.palco', a.el)); cards.set(it.id, { el: criarCard(it), chave: k }); }
+    });
+
+    var box = $('#lista');
+    Array.from(box.children).forEach(function (g) { g.remove(); });
+    if (!lista.length) {
+      var e = el('div', 'vazio');
+      if (st.vista === 'fora' && !st.busca) { e.appendChild(el('b', null, 'Nenhuma animação fora do ar')); e.appendChild(document.createTextNode('Quando você tirar uma do ar, ela fica guardada aqui e pode voltar quando quiser.')); }
+      else if (st.app && !st.busca && !st.itens.some(function (it) { return sistemaDe(it) === st.app; })) {
+        e.appendChild(el('b', null, 'Nenhuma animação em ' + st.app + ' ainda'));
+        e.appendChild(document.createTextNode(st.podeEscrever ? 'Adicione a primeira pelo botão no topo. Ela já entra neste app.' : 'Quando alguém adicionar uma animação deste app, ela aparece aqui.'));
+        var doc = st.sistemas[slug(st.app)];
+        if (st.podeEscrever && doc) {
+          var rm = el('button', 'btn btn-perigo', 'Remover esta aba'); rm.type = 'button'; rm.style.marginTop = '16px';
+          rm.onclick = async function () {
+            rm.disabled = true;
+            try { await st.db.doc('sistemas/' + slug(st.app)).delete(); toast('Aba removida'); }
+            catch (x) { rm.disabled = false; toast(msgErro(x)); }
+          };
+          e.appendChild(el('br')); e.appendChild(rm);
+        }
+      }
+      else if (st.itens.length) { e.appendChild(el('b', null, 'Nada encontrado')); e.appendChild(document.createTextNode('Tente outro nome ou limpe a busca.')); }
+      else { e.appendChild(el('b', null, 'O acervo está vazio')); e.appendChild(document.createTextNode(st.podeEscrever ? 'Adicione a primeira animação pelo botão no topo.' : 'Quando alguém adicionar uma animação, ela aparece aqui.')); }
+      box.appendChild(e); return;
+    }
+    // sistema → seção → animações (na ordem definida de cada seção)
+    sistemasOrdenados(lista).forEach(function (s) {
+      var doSistema = lista.filter(function (it) { return sistemaDe(it) === s; });
+      var g = el('section', 'grupo');
+      var cab = el('div', 'grupo-cab'); cab.appendChild(logoEl(s, true)); cab.appendChild(el('h3', null, s));
+      cab.appendChild(el('span', null, doSistema.length + (doSistema.length === 1 ? ' animação' : ' animações')));
+      if (st.podeEscrever && s !== SEM_SISTEMA) {
+        var tem = st.sistemas[slug(s)] && st.sistemas[slug(s)].logo;
+        var bl = el('button', 'btn btn-mini', tem ? 'Trocar logo' : 'Adicionar logo'); bl.type = 'button';
+        bl.onclick = function () { pedirLogo(s); };
+        cab.appendChild(bl);
+      }
+      g.appendChild(cab);
+      secoesDe(lista, s).forEach(function (sec) {
+        var itens = doSistema.filter(function (it) { return secaoDe(it) === sec; }).sort(porOrdem);
+        var sg = el('div', 'subgrupo');
+        var sc = el('div', 'subgrupo-cab'); sc.appendChild(el('h4', null, sec)); sc.appendChild(el('span', null, String(itens.length)));
+        sg.appendChild(sc);
+        var grade = el('div', 'grade');
+        itens.forEach(function (it) { grade.appendChild(cards.get(it.id).el); });
+        sg.appendChild(grade); g.appendChild(sg);
+      });
+      box.appendChild(g);
+    });
+  }
+
+  /* ---------- detalhe ---------- */
+  var atual = null, abaAtual = 'html', passoAtual = 1;
+  function mostrarPasso(n) {
+    passoAtual = n;
+    var comPagina = temPagina(atual);
+    $('#det-passos').hidden = !comPagina;
+    $('#det-passos').querySelectorAll('.passo').forEach(function (p) { p.classList.toggle('on', +p.dataset.p === n); });
+    $('#det-v1').hidden = n !== 1; $('#det-v2').hidden = n !== 2;
+    $('#det-voltar').hidden = !(n === 2 && comPagina);
+    if (n === 1) { desmontar($('#det-palco')); montarPagina($('#det-pagina'), atual); }
+    else { desmontar($('#det-pagina')); montar($('#det-palco'), atual); }
+  }
+  $('#det-continuar').onclick = function () { mostrarPasso(2); $('#det-v2').scrollIntoView({ block: 'start' }); };
+  $('#det-voltar').onclick = function () { mostrarPasso(1); };
+  function abrir(id, manter) {
+    var it = st.itens.find(function (x) { return x.id === id; }); if (!it) return;
+    atual = it;
+    $('#det-titulo').textContent = it.titulo || 'Sem nome';
+    $('#det-desc').textContent = it.descricao || '';
+    $('#det-dica-base').hidden = !(it.baseHtml || it.baseCss);
+    $('#copiar-html').hidden = !(it.html || '').trim();
+    var m = $('#det-meta'); m.innerHTML = '';
+    var s = el('span', 'status ' + (noAr(it) ? 'no-ar' : 'fora')); s.appendChild(el('i')); s.appendChild(document.createTextNode(noAr(it) ? 'No ar' : 'Fora do ar')); m.appendChild(s);
+    var sis = el('span'); sis.style.cssText = 'display:inline-flex;align-items:center;gap:8px'; sis.appendChild(logoEl(sistemaDe(it))); sis.appendChild(el('b', null, sistemaDe(it))); m.appendChild(sis);
+    (it.tags || []).forEach(function (t) { m.appendChild(el('span', 'tag', t)); });
+    var abas = $('#det-abas'); abas.innerHTML = '';
+    var partes = [['html', 'HTML'], ['css', 'CSS'], ['js', 'JavaScript']].filter(function (p) { return (it[p[0]] || '').trim(); });
+    abaAtual = partes.length ? partes[0][0] : 'html';
+    partes.forEach(function (p) {
+      var b = el('button', null, p[1]); b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.aba = p[0];
+      b.onclick = function () { abaAtual = p[0]; mostrarAba(); };
+      abas.appendChild(b);
+    });
+    mostrarAba();
+    $('#copiar-js').hidden = !(it.js || '').trim();
+    acoes();
+    if (!$('#detalhe').open) $('#detalhe').showModal();
+    mostrarPasso(manter ? (temPagina(it) ? passoAtual : 2) : (temPagina(it) ? 1 : 2));
+  }
+  function mostrarAba() {
+    $('#det-abas').querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.aba === abaAtual); });
+    $('#det-pre').textContent = atual[abaAtual] || '';
+  }
+  function acoes() {
+    var a = $('#det-acoes'); a.innerHTML = '';
+    if (!st.podeEscrever) return;
+    var editar = el('button', 'btn', 'Editar'); editar.type = 'button';
+    editar.onclick = function () { $('#detalhe').close(); abrirForm(atual); };
+    a.appendChild(editar);
+    var trocar = el('button', 'btn', noAr(atual) ? 'Tirar do ar' : 'Colocar no ar'); trocar.type = 'button';
+    trocar.onclick = async function () {
+      trocar.disabled = true;
+      var vai = !noAr(atual);
+      try {
+        await st.db.doc('animacoes/' + atual.id).update({ noAr: vai, atualizadoEm: Date.now() });
+        toast(vai ? '“' + atual.titulo + '” voltou ao ar' : '“' + atual.titulo + '” saiu do ar e ficou guardada em Fora do ar');
+        $('#detalhe').close();
+      } catch (e) { trocar.disabled = false; toast(msgErro(e)); }
+    };
+    a.appendChild(trocar);
+    if (!noAr(atual)) {
+      var apagar = el('button', 'btn btn-perigo', 'Apagar de vez'); apagar.type = 'button';
+      apagar.onclick = function () {
+        a.innerHTML = '';
+        var c = el('div', 'confirma'); c.appendChild(el('span', null, 'Apagar para sempre? Não dá para desfazer.'));
+        var sim = el('button', 'btn btn-perigo', 'Sim, apagar'); sim.type = 'button';
+        var nao = el('button', 'btn', 'Cancelar'); nao.type = 'button'; nao.onclick = acoes;
+        sim.onclick = async function () {
+          sim.disabled = nao.disabled = true;
+          try { await st.db.doc('animacoes/' + atual.id).delete(); $('#detalhe').close(); toast('Animação apagada'); }
+          catch (e) { sim.disabled = nao.disabled = false; toast(msgErro(e)); }
+        };
+        c.appendChild(sim); c.appendChild(nao); a.appendChild(c);
+      };
+      a.appendChild(apagar);
+    }
+  }
+  $('#det-reiniciar').onclick = function () { if (atual) mostrarPasso(passoAtual); };
+  document.querySelectorAll('[data-copiar]').forEach(function (b) {
+    b.onclick = function () {
+      if (!atual) return;
+      var tipo = b.dataset.copiar, txt = tipo === 'tudo' ? arquivoCompleto(atual, false) : (atual[tipo] || '');
+      var rot = b.textContent;
+      var ok = function () { b.textContent = 'Copiado'; setTimeout(function () { b.textContent = rot; }, 1400); };
+      var falha = function () {
+        if (tipo !== 'tudo') { abaAtual = tipo; mostrarAba(); } else $('#det-pre').textContent = txt;
+        var s = getSelection(), r = document.createRange(); r.selectNodeContents($('#det-pre')); s.removeAllRanges(); s.addRange(r);
+        toast('Código selecionado: use Ctrl+C para copiar');
+      };
+      try { navigator.clipboard.writeText(txt).then(ok, falha); } catch (e) { falha(); }
+    };
+  });
+  $('#detalhe').addEventListener('close', function () { desmontar($('#det-palco')); desmontar($('#det-pagina')); atual = null; });
+  document.querySelectorAll('[data-fechar]').forEach(function (b) { b.onclick = function () { b.closest('dialog').close(); }; });
+  document.querySelectorAll('dialog').forEach(function (d) { d.addEventListener('click', function (e) { if (e.target === d) d.close(); }); });
+
+  /* ---------- adicionar / editar ---------- */
+  var editando = null, previaT;
+  function erroForm(m) { var e = $('#f-erro'); e.hidden = !m; e.textContent = m || ''; }
+  function valores() {
+    var tags = [];
+    $('#f-tags').value.split(',').forEach(function (t) { t = t.trim().toLowerCase().slice(0, 24); if (t && tags.indexOf(t) < 0 && tags.length < 3) tags.push(t); });
+    return { titulo: $('#f-nome').value.trim().slice(0, 80), sistema: $('#f-sistema').value.trim().slice(0, 40), secao: $('#f-secao').value.trim().slice(0, 40),
+             tags: tags, descricao: $('#f-desc').value.trim().slice(0, 400),
+             html: $('#f-html').value, css: $('#f-css').value, js: $('#f-js').value, paginaHtml: $('#f-pagina').value.trim() ? $('#f-pagina').value : '' };
+  }
+  function previa() {
+    var v = valores(); v.titulo = v.titulo || 'Pré-visualização';
+    if (editando) { v.baseHtml = editando.baseHtml; v.baseCss = editando.baseCss; } // mesma estrutura de teste da animação
+    montar($('#f-palco'), v);
+  }
+  function abrirForm(it) {
+    editando = it || null;
+    $('#form').reset(); erroForm('');
+    $('#form-titulo').textContent = it ? 'Editar animação' : 'Adicionar animação';
+    $('#form-sub').textContent = it ? 'As mudanças aparecem para todos assim que você salvar.' : 'Ela entra no ar assim que você salvar.';
+    $('#f-salvar').textContent = it ? 'Salvar alterações' : 'Salvar e colocar no ar';
+    if (it) {
+      $('#f-nome').value = it.titulo || ''; $('#f-sistema').value = it.sistema || ''; $('#f-tags').value = (it.tags || []).join(', ');
+      $('#f-desc').value = it.descricao || ''; $('#f-html').value = it.html || ''; $('#f-css').value = it.css || ''; $('#f-js').value = it.js || '';
+    } else {
+      var vi = vistaInfo(); // já vem com o app e a seção abertos
+      if (st.app && st.app !== SEM_SISTEMA) $('#f-sistema').value = st.app;
+      if (vi.secao) $('#f-secao').value = vi.secao;
+    }
+    if (it) $('#f-secao').value = it.secao || '';
+    $('#f-js-box').open = !!(it && (it.js || '').trim());
+    $('#f-pagina').value = (it && it.paginaHtml) || '';
+    $('#f-pagina-box').open = !!(it && ((it.paginaHtml || '').trim() || it.pagina));
+    var pub = $('#f-pagina-pub');
+    pub.hidden = !(it && it.pagina);
+    pub.textContent = it && it.pagina ? 'Esta animação já mostra a página publicada junto com o acervo (' + it.pagina.split('#')[0] + '). Cole outra página aqui só se quiser trocar.' : '';
+    previa();
+    $('#form-dlg').showModal(); $('#f-nome').focus();
+  }
+  ['#f-html', '#f-css', '#f-js'].forEach(function (s) {
+    $(s).addEventListener('input', function () { clearTimeout(previaT); previaT = setTimeout(previa, 450); });
+    $(s).addEventListener('keydown', function (e) { if (e.key !== 'Tab' || e.shiftKey) return; e.preventDefault(); e.target.setRangeText('  ', e.target.selectionStart, e.target.selectionEnd, 'end'); });
+  });
+  $('#btn-nova').onclick = function () { abrirForm(null); };
+  $('#form-dlg').addEventListener('close', function () { desmontar($('#f-palco')); editando = null; });
+
+  function msgErro(e) {
+    if (e && e.code === 'quota_exceeded') return 'O acervo chegou ao limite de itens. Apague animações que estão fora do ar.';
+    if (e && e.code === 'invalid_argument') return 'Só o administrador pode alterar o acervo.';
+    if (e && e.code === 'resource_exhausted') return 'Muitas alterações seguidas. Espere alguns segundos e tente de novo.';
+    return 'Não foi possível salvar agora. Tente de novo em instantes.';
+  }
+  $('#form').addEventListener('submit', async function (e) {
+    e.preventDefault(); erroForm('');
+    var v = valores();
+    if (!v.titulo) { erroForm('Dê um nome para a animação.'); $('#f-nome').focus(); return; }
+    if (!(v.html + v.css + v.js).trim()) { erroForm('Cole o HTML e o CSS da animação.'); $('#f-html').focus(); return; }
+    if ((v.html + v.css + v.js + v.paginaHtml).length > 200000) { erroForm('O código e a página juntos passaram de 200 mil caracteres. Deixe a página completa mais enxuta.'); return; }
+    if (editando && editando.pagina && v.paginaHtml) v.pagina = ''; // a página colada passa a valer no lugar da publicada
+    var btn = $('#f-salvar'), rot = btn.textContent; btn.disabled = true; btn.textContent = 'Salvando…';
+    try {
+      v.atualizadoEm = Date.now();
+      // posição na seção: seção existente → entra no fim dela; seção nova → vira a última do sistema
+      if (!editando || secaoDe(editando) !== (v.secao || SEM_SECAO) || sistemaDe(editando) !== (v.sistema || SEM_SISTEMA)) {
+        var outros = st.itens.filter(function (i) { return (!editando || i.id !== editando.id) && sistemaDe(i) === (v.sistema || SEM_SISTEMA); });
+        var daSecao = outros.filter(function (i) { return secaoDe(i) === (v.secao || SEM_SECAO); });
+        v.secaoOrdem = daSecao.length ? (daSecao[0].secaoOrdem || 99) : outros.reduce(function (m, i) { return Math.max(m, i.secaoOrdem || 0); }, 0) + 1;
+        v.ordem = daSecao.reduce(function (m, i) { return Math.max(m, i.ordem || 0); }, 0) + 1;
+      }
+      if (editando) { await st.db.doc('animacoes/' + editando.id).update(v); toast('Alterações salvas'); }
+      else { v.criadoEm = v.atualizadoEm; v.noAr = true; await st.db.collection('animacoes').add(v); toast('“' + v.titulo + '” está no ar'); }
+      $('#form-dlg').close();
+    } catch (x) { erroForm(msgErro(x)); }
+    finally { btn.disabled = false; btn.textContent = rot; }
+  });
+
+
+  /* ---------- novo app (aba) ---------- */
+  function abrirNovoApp() { $('#app-form').reset(); $('#app-erro').hidden = true; $('#app-dlg').showModal(); $('#app-nome').focus(); }
+  $('#app-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var nome = $('#app-nome').value.trim().replace(/\s+/g, ' ').slice(0, 40), erro = $('#app-erro');
+    if (!nome) { erro.textContent = 'Dê um nome para o app.'; erro.hidden = false; return; }
+    var existente = appsLista().find(function (a) { return slug(a) === slug(nome); });
+    if (existente) { $('#app-dlg').close(); abrirApp(existente); return; }
+    var btn = $('#app-salvar'); btn.disabled = true;
+    try {
+      var novo = { nome: nome, atualizadoEm: Date.now() };
+      await st.db.doc('sistemas/' + slug(nome)).set(novo);
+      st.sistemas[slug(nome)] = novo; // já mostra a aba, sem esperar o aviso do banco
+      $('#app-dlg').close(); abrirApp(nome); toast('Aba “' + nome + '” criada');
+    } catch (x) { erro.textContent = msgErro(x); erro.hidden = false; }
+    finally { btn.disabled = false; }
+  });
+
+  /* ---------- busca e navegação ---------- */
+  var buscaT;
+  $('#busca').addEventListener('input', function () { var v = this.value; clearTimeout(buscaT); buscaT = setTimeout(function () { st.busca = v; render(); }, 180); });
+  $('#nav-fora').onclick = function () { st.vista = 'fora'; render(); };
+
+  /* ---------- banco (Supabase) ----------
+     Mesma interface que o acervo usava: doc('tabela/id').set/update/delete,
+     collection('tabela').add/onSnapshot. Cada linha guarda o documento em "dados". */
+  function erroBanco(e) {
+    var x = new Error((e && e.message) || 'falha');
+    var negado = e && (e.code === '42501' || /row-level security|permission denied|sem permiss/i.test(e.message || ''));
+    x.code = negado ? 'invalid_argument' : 'falha';
+    return x;
+  }
+  function criarBanco(sb) {
+    return {
+      doc: function (caminho) {
+        var p = caminho.split('/'), tabela = p[0], id = p[1];
+        return {
+          set: async function (dados) {
+            var q = await sb.from(tabela).upsert({ id: id, dados: dados }).select('id');
+            if (q.error) throw erroBanco(q.error);
+            if (!q.data || !q.data.length) throw erroBanco({ code: '42501' });
+          },
+          update: async function (parte) {
+            var atual = await sb.from(tabela).select('dados').eq('id', id).maybeSingle();
+            if (atual.error) throw erroBanco(atual.error);
+            if (!atual.data) throw erroBanco({ code: '42501' });
+            var q = await sb.from(tabela).update({ dados: Object.assign({}, atual.data.dados, parte) }).eq('id', id).select('id');
+            if (q.error) throw erroBanco(q.error);
+            if (!q.data.length) throw erroBanco({ code: '42501' });
+          },
+          delete: async function () {
+            var q = await sb.from(tabela).delete().eq('id', id).select('id');
+            if (q.error) throw erroBanco(q.error);
+            if (!q.data.length) throw erroBanco({ code: '42501' });
+          }
+        };
+      },
+      collection: function (tabela) {
+        return {
+          add: async function (dados) {
+            var id = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+            var q = await sb.from(tabela).insert({ id: id, dados: dados }).select('id');
+            if (q.error) throw erroBanco(q.error);
+            return id;
+          },
+          // lê a tabela inteira e relê quando algo muda (tempo real)
+          onSnapshot: function (cb, falha) {
+            var t = null;
+            async function carregar() {
+              var q = await sb.from(tabela).select('id, dados');
+              if (q.error) { if (falha) falha(q.error); return; }
+              cb({ docs: q.data.map(function (l) { return { id: l.id, data: function () { return l.dados; } }; }) });
+            }
+            sb.channel('tabela-' + tabela)
+              .on('postgres_changes', { event: '*', schema: 'public', table: tabela }, function () { clearTimeout(t); t = setTimeout(carregar, 200); })
+              .subscribe();
+            carregar();
+          }
+        };
+      }
+    };
+  }
+
+  /* ---------- acervo: carrega depois do login ---------- */
+  function iniciar() {
+    st.podeDb = true;
+    aplicarPapel();
+    st.db.collection('animacoes').onSnapshot(function (snap) {
+      st.itens = snap.docs.map(function (d) { var o = Object.assign({}, d.data()); o.id = d.id; return o; });
+      if (atual) { var n = st.itens.find(function (i) { return i.id === atual.id; }); if (!n) $('#detalhe').close(); else if (chaveDe(n) !== chaveDe(atual)) abrir(n.id, true); }
+      render();
+    }, function () { aviso('Não foi possível carregar o acervo. Recarregue a página.'); });
+    st.db.collection('sistemas').onSnapshot(function (snap) {
+      var m = {}; snap.docs.forEach(function (d) { m[d.id] = d.data(); });
+      st.sistemas = m; render();
+    }, function () {});
+  }
+
+  /* ---------- entrada: login do Supabase ---------- */
+  var cfg = window.ANIMASYS_CONFIG || {};
+  var sb = null, perfil = null, conta = null, iniciado = false, perfis = {}, vistos = null;
+  var VOLTA = location.origin + location.pathname;
+  var AVISO_SAIDA = 'animasys-aviso';
+
+  function emailOk(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()); }
+  function erroEm(sel, t) { var e = $(sel); e.textContent = t || ''; e.hidden = !t; }
+  var TELAS = ['carregando', 'login', 'pedido', 'confirme', 'status', 'esqueci', 'nova-senha', 'aviso'];
+  var FOCO = { login: '#login-email', pedido: '#ped-nome', esqueci: '#esq-email', 'nova-senha': '#nova-senha' };
+  var telaAtual = null;
+  function tela(nome) {
+    telaAtual = nome;
+    TELAS.forEach(function (t) { $('#ent-' + t).hidden = t !== nome; });
+    if (FOCO[nome]) $(FOCO[nome]).focus();
+  }
+  function avisoEntrada(t) { $('#ent-aviso-txt').textContent = t; tela('aviso'); }
+
+  document.querySelectorAll('[data-olho]').forEach(function (b) {
+    b.onclick = function () {
+      var i = b.parentNode.querySelector('input'), ver = i.type === 'password';
+      i.type = ver ? 'text' : 'password';
+      b.setAttribute('aria-label', ver ? 'Esconder senha' : 'Mostrar senha');
+    };
+  });
+  document.querySelectorAll('[data-ir]').forEach(function (b) {
+    b.onclick = function () {
+      var destino = b.dataset.ir, email = $('#login-email').value.trim();
+      if (destino === 'pedido') { $('#ent-pedido').reset(); erroEm('#ped-erro', ''); if (email) $('#ped-email').value = email; }
+      if (destino === 'esqueci') { $('#ent-esqueci').reset(); erroEm('#esq-erro', ''); $('#esq-ok').hidden = true; if (email) $('#esq-email').value = email; }
+      if (destino === 'login') erroEm('#login-erro', '');
+      tela(destino);
+    };
+  });
+
+  function traduzir(e) {
+    var m = (e && e.message) || '';
+    if (/invalid login credentials/i.test(m)) return 'E-mail ou senha incorretos.';
+    if (/email not confirmed/i.test(m)) return 'Confirme o seu e-mail antes de entrar. Procure o link na sua caixa de entrada.';
+    if (/already registered|already been registered/i.test(m)) return 'Esse e-mail já tem cadastro. Entre com ele ou use Esqueci minha senha.';
+    if (/password should be at least|weak password/i.test(m)) return 'A senha precisa ter pelo menos 8 caracteres.';
+    if (/rate limit|too many|security purposes/i.test(m)) return 'Muitas tentativas seguidas. Espere um pouco e tente de novo.';
+    if (/fetch|network/i.test(m)) return 'Sem conexão com o servidor. Verifique a sua internet.';
+    return 'Não foi possível concluir agora. Tente de novo em instantes.';
+  }
+
+  async function sair(motivo) {
+    try { if (motivo) sessionStorage.setItem(AVISO_SAIDA, motivo); } catch (e) {}
+    try { await sb.auth.signOut(); } catch (e) {}
+    location.replace(VOLTA);
+  }
+  $('#btn-sair').onclick = function () { sair(); };
+  $('#st-sair').onclick = function () { sair(); };
+
+  // Depois de entrar: lê o perfil e decide o que mostrar
+  async function aposEntrar(usuario) {
+    var q = await sb.from('perfis').select('*').eq('id', usuario.id).maybeSingle();
+    if (q.error || !q.data) { avisoEntrada('Não foi possível carregar a sua conta. Recarregue a página.'); return; }
+    perfil = q.data;
+    sb.channel('meu-perfil')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'perfis', filter: 'id=eq.' + usuario.id }, function (msg) {
+        var antes = perfil.status;
+        perfil = msg.new;
+        if (conta && perfil.status !== 'liberado') { sair('O seu acesso foi removido.'); return; }
+        if (!conta && perfil.status !== antes) mostrarStatus();
+      })
+      .subscribe();
+    if (perfil.status === 'liberado') entrar(); else mostrarStatus();
+  }
+
+  function mostrarStatus() {
+    var sit = perfil.status;
+    var selo = { pendente: 'Aguardando liberação', liberado: 'Acesso liberado', recusado: 'Não aprovado', removido: 'Acesso removido' }[sit];
+    $('#st-selo').className = 'st-selo ' + (sit === 'liberado' ? 'liberado' : sit === 'pendente' ? 'pendente' : 'recusado');
+    $('#st-selo-txt').textContent = selo;
+    $('#ent-status').classList.toggle('st-liberado', sit === 'liberado');
+    $('#st-titulo').textContent = sit === 'liberado' ? 'Acesso liberado!' : sit === 'pendente' ? 'Pedido enviado' : sit === 'recusado' ? 'Pedido não aprovado' : 'Acesso removido';
+    $('#st-texto').textContent = sit === 'liberado' ? 'Pronto' + (perfil.nome ? ', ' + perfil.nome : '') + '. Você já pode entrar no animasys.'
+      : sit === 'pendente' ? 'O administrador já recebeu o seu pedido. Quando ele liberar, esta tela muda sozinha para Acesso liberado. Pode deixar aberta.'
+      : sit === 'recusado' ? 'O administrador não liberou este pedido. Se achar que é engano, fale com ele.'
+      : 'O seu acesso ao animasys foi removido pelo administrador.';
+    $('#st-entrar').hidden = sit !== 'liberado';
+    tela('status');
+  }
+  $('#st-entrar').onclick = function () { entrar(); };
+
+  function entrar() {
+    conta = perfil;
+    st.admin = conta.papel === 'admin';
+    $('#entrada').hidden = true; $('#app').hidden = false;
+    $('#sessao-nome').textContent = conta.nome || conta.email;
+    $('#sessao-papel').textContent = st.admin ? 'Admin' : 'Usuário';
+    $('#btn-acessos').hidden = !st.admin;
+    $('#sessao').hidden = false;
+    $('#login-senha').value = '';
+    scrollTo(0, 0);
+    if (!iniciado) {
+      iniciado = true;
+      iniciar();
+      if (st.admin) assinarPerfis();
+    }
+  }
+
+  /* ---------- telas de entrada ---------- */
+  $('#ent-login').addEventListener('submit', async function (e) {
+    e.preventDefault(); erroEm('#login-erro', '');
+    var email = $('#login-email').value.trim(), senha = $('#login-senha').value;
+    if (!emailOk(email)) { erroEm('#login-erro', 'Digite um e-mail válido.'); $('#login-email').focus(); return; }
+    if (!senha) { erroEm('#login-erro', 'Digite a sua senha.'); $('#login-senha').focus(); return; }
+    var btn = $('#login-btn'), rot = btn.innerHTML; btn.disabled = true; btn.textContent = 'Entrando…';
+    try {
+      var r = await sb.auth.signInWithPassword({ email: email, password: senha });
+      if (r.error) {
+        if (/email not confirmed/i.test(r.error.message || '')) { mostrarConfirme(email); return; }
+        erroEm('#login-erro', traduzir(r.error)); $('#login-senha').select(); return;
+      }
+      await aposEntrar(r.data.user);
+    } catch (x) { erroEm('#login-erro', traduzir(x)); }
+    finally { btn.disabled = false; btn.innerHTML = rot; }
+  });
+
+  function validarNova(nome, email, senha, sel) {
+    if (nome !== null && !nome) { erroEm(sel, 'Digite o seu nome.'); return false; }
+    if (email !== null && !emailOk(email)) { erroEm(sel, 'Digite um e-mail válido.'); return false; }
+    if (senha.length < 8) { erroEm(sel, 'A senha precisa ter pelo menos 8 caracteres.'); return false; }
+    return true;
+  }
+
+  $('#ent-pedido').addEventListener('submit', async function (e) {
+    e.preventDefault(); erroEm('#ped-erro', '');
+    var nome = $('#ped-nome').value.trim(), email = $('#ped-email').value.trim(), senha = $('#ped-senha').value, msg = $('#ped-msg').value.trim();
+    if (!validarNova(nome, email, senha, '#ped-erro')) return;
+    if (senha !== $('#ped-senha2').value) { erroEm('#ped-erro', 'As duas senhas não são iguais.'); return; }
+    var btn = $('#ped-btn'), rot = btn.innerHTML; btn.disabled = true; btn.textContent = 'Enviando…';
+    try {
+      var r = await sb.auth.signUp({ email: email, password: senha, options: { data: { nome: nome.slice(0, 60), mensagem: msg.slice(0, 500) }, emailRedirectTo: VOLTA } });
+      if (r.error) { erroEm('#ped-erro', traduzir(r.error)); return; }
+      // e-mail já cadastrado: o Supabase responde sem erro, mas sem identidades
+      if (r.data.user && r.data.user.identities && !r.data.user.identities.length) { erroEm('#ped-erro', 'Esse e-mail já tem cadastro. Entre com ele ou use Esqueci minha senha.'); return; }
+      if (r.data.session) { await aposEntrar(r.data.user); return; }
+      mostrarConfirme(email);
+    } catch (x) { erroEm('#ped-erro', traduzir(x)); }
+    finally { btn.disabled = false; btn.innerHTML = rot; }
+  });
+
+  var emailConfirme = '';
+  function mostrarConfirme(email) {
+    emailConfirme = email;
+    $('#conf-email').textContent = email;
+    $('#conf-msg').textContent = '';
+    tela('confirme');
+  }
+  $('#conf-reenviar').onclick = async function () {
+    var b = this; b.disabled = true;
+    try {
+      var r = await sb.auth.resend({ type: 'signup', email: emailConfirme, options: { emailRedirectTo: VOLTA } });
+      $('#conf-msg').textContent = r.error ? traduzir(r.error) : 'Enviamos de novo. Confira também a caixa de spam.';
+    } catch (x) { $('#conf-msg').textContent = traduzir(x); }
+    finally { b.disabled = false; }
+  };
+
+  $('#ent-esqueci').addEventListener('submit', async function (e) {
+    e.preventDefault(); erroEm('#esq-erro', ''); $('#esq-ok').hidden = true;
+    var email = $('#esq-email').value.trim();
+    if (!emailOk(email)) { erroEm('#esq-erro', 'Digite um e-mail válido.'); return; }
+    var btn = $('#esq-btn'), rot = btn.innerHTML; btn.disabled = true; btn.textContent = 'Enviando…';
+    try {
+      var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: VOLTA });
+      if (r.error) { erroEm('#esq-erro', traduzir(r.error)); return; }
+      $('#esq-ok').textContent = 'Se esse e-mail tiver cadastro, o link chega em alguns minutos. Confira também a caixa de spam.';
+      $('#esq-ok').hidden = false;
+    } catch (x) { erroEm('#esq-erro', traduzir(x)); }
+    finally { btn.disabled = false; btn.innerHTML = rot; }
+  });
+
+  $('#ent-nova-senha').addEventListener('submit', async function (e) {
+    e.preventDefault(); erroEm('#nova-erro', '');
+    var senha = $('#nova-senha').value;
+    if (!validarNova(null, null, senha, '#nova-erro')) return;
+    if (senha !== $('#nova-senha2').value) { erroEm('#nova-erro', 'As duas senhas não são iguais.'); return; }
+    var btn = $('#nova-btn'), rot = btn.innerHTML; btn.disabled = true; btn.textContent = 'Salvando…';
+    try {
+      var r = await sb.auth.updateUser({ password: senha });
+      if (r.error) { erroEm('#nova-erro', traduzir(r.error)); return; }
+      toast('Senha nova salva');
+      await aposEntrar(r.data.user);
+    } catch (x) { erroEm('#nova-erro', traduzir(x)); }
+    finally { btn.disabled = false; btn.innerHTML = rot; }
+  });
+
+  /* ---------- acessos: só o admin ---------- */
+  function assinarPerfis() {
+    var t = null;
+    async function carregar() {
+      var q = await sb.from('perfis').select('*').order('criado_em');
+      if (q.error) return;
+      var m = {}; q.data.forEach(function (p) { m[p.id] = p; });
+      perfis = m; renderAcessos();
+    }
+    sb.channel('perfis-admin')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'perfis' }, function () { clearTimeout(t); t = setTimeout(carregar, 200); })
+      .subscribe();
+    carregar();
+  }
+  async function decidir(id, status, botoes) {
+    botoes.forEach(function (b) { b.disabled = true; });
+    var q = await sb.from('perfis').update({ status: status, decidido_em: new Date().toISOString() }).eq('id', id).select('id');
+    if (q.error || !q.data.length) {
+      botoes.forEach(function (b) { b.disabled = false; });
+      toast(q.error && /administrador/.test(q.error.message || '') ? q.error.message : 'Não foi possível salvar agora. Tente de novo.');
+      return;
+    }
+    var p = perfis[id];
+    toast(status === 'liberado' ? 'Acesso de ' + (p.nome || p.email) + ' liberado' : status === 'recusado' ? 'Pedido recusado' : 'Acesso de ' + (p.nome || p.email) + ' removido');
+  }
+  function linhaPerfil(p, acoes) {
+    var li = el('li'), q = el('span', 'quem');
+    q.appendChild(el('b', null, p.nome || p.email));
+    q.appendChild(el('span', null, p.email + (p.mensagem ? ' · ' + p.mensagem : '')));
+    li.appendChild(q);
+    var ac = el('span', 'acoes-li'), botoes = [];
+    acoes.forEach(function (a) {
+      var b = el('button', 'btn btn-mini' + (a.classe ? ' ' + a.classe : ''), a.rotulo); b.type = 'button';
+      b.onclick = function () {
+        if (a.confirmar && b.dataset.conf !== '1') { b.dataset.conf = '1'; b.textContent = 'Confirmar'; return; }
+        decidir(p.id, a.status, botoes);
+      };
+      botoes.push(b); ac.appendChild(b);
+    });
+    if (p.papel === 'admin') ac.appendChild(el('span', 'voce', conta && p.id === conta.id ? 'Você · admin' : 'Admin'));
+    li.appendChild(ac);
+    return li;
+  }
+  function lista(sel, itens, vazio, acoes) {
+    var ul = $(sel); ul.innerHTML = '';
+    if (!itens.length) { var li = el('li'); li.appendChild(el('span', 'dica', vazio)); ul.appendChild(li); return; }
+    itens.forEach(function (p) { ul.appendChild(linhaPerfil(p, p.papel === 'admin' ? [] : acoes)); });
+  }
+  function renderAcessos() {
+    var todos = Object.keys(perfis).map(function (id) { return perfis[id]; });
+    var pend = todos.filter(function (p) { return p.status === 'pendente'; });
+    var lib = todos.filter(function (p) { return p.status === 'liberado'; });
+    var fora = todos.filter(function (p) { return p.status === 'recusado' || p.status === 'removido'; });
+    if (vistos) pend.forEach(function (p) { if (!vistos[p.id]) toast('Novo pedido de convite: ' + (p.nome || p.email)); });
+    vistos = {}; pend.forEach(function (p) { vistos[p.id] = 1; });
+    var badge = $('#n-pedidos'); badge.hidden = !pend.length; badge.textContent = pend.length;
+    lista('#lista-pendentes', pend, 'Nenhum pedido esperando.', [{ rotulo: 'Liberar', status: 'liberado', classe: 'btn-pri' }, { rotulo: 'Recusar', status: 'recusado', confirmar: true }]);
+    lista('#lista-liberados', lib, 'Ninguém além de você por enquanto.', [{ rotulo: 'Remover', status: 'removido', classe: 'btn-perigo', confirmar: true }]);
+    $('#box-fora').hidden = !fora.length;
+    lista('#lista-fora', fora, '', [{ rotulo: 'Liberar', status: 'liberado' }]);
+  }
+  $('#btn-acessos').onclick = function () { renderAcessos(); $('#acessos-dlg').showModal(); };
+
+  async function entrada() {
+    tela('carregando');
+    if (!window.supabase || !cfg.supabaseUrl || !cfg.supabaseAnonKey) {
+      avisoEntrada('O animasys ainda não foi ligado ao banco de dados. Falta configurar o Supabase no servidor.');
+      return;
+    }
+    sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+    st.db = criarBanco(sb);
+    var motivo = null;
+    try { motivo = sessionStorage.getItem(AVISO_SAIDA); sessionStorage.removeItem(AVISO_SAIDA); } catch (e) {}
+    var recuperando = /type=recovery/.test(location.hash);
+    sb.auth.onAuthStateChange(function (evento) {
+      if (evento === 'PASSWORD_RECOVERY') { recuperando = true; tela('nova-senha'); }
+    });
+    var r = await sb.auth.getSession();
+    if (recuperando && r.data.session) { tela('nova-senha'); return; }
+    if (r.data.session) { await aposEntrar(r.data.session.user); return; }
+    tela('login');
+    if (motivo) erroEm('#login-erro', motivo);
+  }
+  render();
+  entrada();
+})();
+</script>
+</body>
+</html>

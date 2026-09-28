@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entrar · trilha.lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topo claro">
+  <div class="wrap topo-in">
+    <a class="marca" href="index.html">
+      <svg class="marca-ico" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="mg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff634f"/><stop offset="1" stop-color="#b73560"/></linearGradient></defs><circle cx="16" cy="16" r="15" fill="url(#mg)"/><path d="M8 21c3-1 3-7 7-8s4 5 9 2" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
+      <span>trilha.lab</span>
+    </a>
+    <nav><a href="index.html" data-texto="entrar-nav">Início</a></nav>
+    <button class="menu-btn" type="button" aria-label="Abrir menu">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <div class="entrar">
+    <h1 class="titulo-pagina" data-texto="entrar-titulo">Entrar</h1>
+    <p class="entrar-sub" data-texto="entrar-sub">Área restrita do laboratório de animações.</p>
+
+    <form class="entrar-form" id="form-entrar" novalidate>
+      <div>
+        <label class="rotulo" for="email" data-texto="entrar-email">E-mail</label>
+        <input class="campo" id="email" type="email" autocomplete="off">
+      </div>
+      <div>
+        <label class="rotulo" for="senha" data-texto="entrar-senha">Senha</label>
+        <div class="campo-senha">
+          <input class="campo" id="senha" type="password" autocomplete="off">
+          <button type="button" class="mostrar" id="mostrar" aria-pressed="false" aria-label="Mostrar senha" title="Mostrar senha">
+            <svg class="olho" viewBox="0 0 24 24" aria-hidden="true">
+              <defs><clipPath id="olho-abertura"><path id="olho-clip"/></clipPath></defs>
+              <g clip-path="url(#olho-abertura)">
+                <g id="olho-iris">
+                  <circle class="olho-pupila" id="olho-pupila" cx="12" cy="12" r="3.4"/>
+                  <circle class="olho-brilho" id="olho-brilho" cx="13.3" cy="10.7" r="1"/>
+                </g>
+              </g>
+              <path class="olho-palpebra" id="olho-baixo"/>
+              <path class="olho-palpebra" id="olho-cima"/>
+              <g id="olho-cilios">
+                <path d="M7.2 14.4l-1.3 2.3"/><path d="M12 15.3v2.6"/><path d="M16.8 14.4l1.3 2.3"/>
+              </g>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <label class="lembrar">
+        <input type="checkbox">
+        <span data-texto="entrar-lembrar">Manter conectado neste aparelho</span>
+      </label>
+      <button type="submit" class="btn-entrar" data-texto="entrar-botao">Entrar</button>
+      <p class="entrar-rodape"><span data-texto="entrar-ajuda-forte">Sem acesso?</span> <span data-texto="entrar-ajuda">Fale com quem administra o projeto.</span></p>
+    </form>
+  </div>
+</main>
+
+<footer class="rodape">
+  <div class="wrap">
+    <div class="rodape-in">
+      <a class="marca" href="index.html">
+        <svg class="marca-ico" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="currentColor"/><path d="M8 21c3-1 3-7 7-8s4 5 9 2" fill="none" stroke="#141416" stroke-width="3" stroke-linecap="round"/></svg>
+        <span>trilha.lab</span>
+        <em class="rodape-lema" data-texto="rodape-lema">laboratório de movimento</em>
+      </a>
+      <nav class="rodape-nav"><a href="#" data-texto="rodape-link">Ajuda</a></nav>
+    </div>
+    <div class="rodape-baixo">
+      <span data-texto="rodape-copy">© 2026 trilha.lab · uso local</span>
+      <span data-texto="rodape-extra">Página de testes</span>
+    </div>
+  </div>
+</footer>
+
+<script src="textos.js"></script>
+<script src="fundo.js"></script><script>
+  // formulário só visual: nada é enviado a lugar nenhum
+  document.getElementById('form-entrar').addEventListener('submit', function (e) { e.preventDefault(); });
+  /* olho: fechado = senha escondida; abre ao mostrar a senha */
+  (function () {
+    var senha = document.getElementById('senha'), mostrar = document.getElementById('mostrar');
+    var $ = function (id) { return document.getElementById(id); };
+    var cima = $('olho-cima'), baixo = $('olho-baixo'), clip = $('olho-clip'), iris = $('olho-iris'),
+        pupila = $('olho-pupila'), brilho = $('olho-brilho'), cilios = $('olho-cilios');
+    var REDUZIR = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var estado = 0, anim = null, piscaTimer = null;
+
+    var lerp = function (a, b, t) { return a + (b - a) * t; };
+    var sai = function (t) { return 1 - Math.pow(1 - t, 3); };
+    var mola = function (t) { var s = 1.6; t -= 1; return t * t * ((s + 1) * t + s) + 1; }; // leve passada do ponto
+
+    // t = 0 fechado … 1 aberto. Pálpebras são curvas cúbicas entre os cantos (2.5,12) e (21.5,12).
+    function desenha(t) {
+      var tc = Math.max(0, t);
+      var cyCima = lerp(15.3, 2.7, t);                // ápice: 14.5 fechado → 5 aberto
+      var cyBaixo = lerp(15.3, 21.3, Math.min(1, tc)); // ápice: 14.5 → 19
+      var c = function (cy) { return 'C6 ' + cy.toFixed(2) + ' 18 ' + cy.toFixed(2) + ' 21.5 12'; };
+      cima.setAttribute('d', 'M2.5 12' + c(cyCima));
+      baixo.setAttribute('d', 'M2.5 12' + c(cyBaixo));
+      baixo.style.opacity = Math.min(1, tc * 2.5);
+      clip.setAttribute('d', 'M2.5 12' + c(cyCima) + 'C18 ' + cyBaixo.toFixed(2) + ' 6 ' + cyBaixo.toFixed(2) + ' 2.5 12Z');
+      var r = Math.max(0, lerp(1.2, 3.4, mola(Math.min(1, tc))));
+      pupila.setAttribute('r', r.toFixed(2));
+      brilho.style.opacity = Math.max(0, (tc - .55) / .45);
+      // cílios acompanham a pálpebra e somem conforme ela sobe
+      var q = Math.min(1, tc * 2.2);
+      cilios.style.opacity = 1 - q;
+      cilios.setAttribute('transform', 'translate(0 ' + (-q * 3).toFixed(2) + ')');
+    }
+
+    function vai(para, dur, curva) {
+      if (anim) cancelAnimationFrame(anim);
+      var de = estado, t0 = performance.now();
+      if (REDUZIR) { estado = para; desenha(para); return Promise.resolve(); }
+      return new Promise(function (ok) {
+        (function quadro(t) {
+          var p = Math.min(1, (t - t0) / dur);
+          estado = lerp(de, para, curva(p));
+          desenha(estado);
+          if (p < 1) anim = requestAnimationFrame(quadro); else { anim = null; ok(); }
+        })(t0);
+      });
+    }
+
+    // depois de abrir, a pupila dá uma olhadinha para a senha e volta
+    function olhadinha() {
+      if (REDUZIR) return;
+      iris.animate([
+        { transform: 'translate(0,0)' },
+        { transform: 'translate(-2.3px,.4px)', offset: .3 },
+        { transform: 'translate(-2.3px,.4px)', offset: .65 },
+        { transform: 'translate(0,0)' }
+      ], { duration: 1100, easing: 'cubic-bezier(.45,0,.25,1)' });
+    }
+
+    // piscadas de vez em quando enquanto a senha está visível
+    function agendaPiscada() {
+      clearTimeout(piscaTimer);
+      if (REDUZIR) return;
+      piscaTimer = setTimeout(function () {
+        if (senha.type !== 'text') return;
+        vai(.05, 90, sai).then(function () { return vai(1, 180, sai); }).then(agendaPiscada);
+      }, 2800 + Math.random() * 3200);
+    }
+
+    desenha(0);
+    // usado pela animação de entrada: abre um pouquinho e fecha
+    window.trilhaOlho = {
+      espiar: function () {
+        if (senha.type !== 'password') return;
+        vai(.45, 260, sai).then(function () { return new Promise(function (ok) { setTimeout(ok, 380); }); })
+          .then(function () { if (senha.type === 'password') vai(0, 220, sai); });
+      }
+    };
+    mostrar.addEventListener('click', function () {
+      var ver = senha.type === 'password';
+      senha.type = ver ? 'text' : 'password';
+      mostrar.setAttribute('aria-pressed', ver);
+      mostrar.setAttribute('aria-label', ver ? 'Ocultar senha' : 'Mostrar senha');
+      mostrar.title = ver ? 'Ocultar senha' : 'Mostrar senha';
+      senha.classList.remove('revela'); void senha.offsetWidth; senha.classList.add('revela');
+      if (ver) {
+        vai(1, 460, mola).then(function () { if (senha.type === 'text') { olhadinha(); agendaPiscada(); } });
+      } else {
+        clearTimeout(piscaTimer);
+        vai(0, 260, function (p) { return p * p * (3 - 2 * p); });
+      }
+    });
+  })();
+</script>
+</body>
+</html>

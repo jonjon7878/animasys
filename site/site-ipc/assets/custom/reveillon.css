@@ -1,0 +1,55 @@
+/* Tema de Réveillon — IPC Comercial (cópia local)
+ * Ativado pela classe body.ipc-reveillon (colocada pelo reveillon.js).
+ * Para desligar: ATIVO = false no reveillon.js (ou remova as duas linhas no index.html). */
+
+/* ---------- A bolinha desce a escada e para no chão com o "pavio aceso" ---------- */
+/* Mesmos degraus da animação original (100% = diâmetro da bolinha), mas em vez de
+   voltar pulando ela fica tremendo no chão; o JS a transforma no primeiro rojão. */
+body.ipc-reveillon .ipc-logo-ball {
+  animation: ipc-rv-desce 1.9s .8s 1 both;
+}
+@keyframes ipc-rv-desce {
+  0%   { transform: translate(0, 0) scale(1);                           animation-timing-function: ease-out; }
+  7%   { transform: translate(0, 0) scale(1.18, .82);                    animation-timing-function: ease-out; }
+  16%  { transform: translate(-60%, var(--ipc-ball-hop, -10%)) scale(.95, 1.05); animation-timing-function: ease-in; }
+  28%  { transform: translate(-109%, 156%) scale(1);                     animation-timing-function: ease-out; }
+  31%  { transform: translate(-109%, 156%) scale(1.25, .75);             animation-timing-function: ease-out; }
+  41%  { transform: translate(-165%, 95%) scale(1);                      animation-timing-function: ease-in; }
+  53%  { transform: translate(-216%, 300%) scale(1);                     animation-timing-function: ease-out; }
+  56%  { transform: translate(-216%, 300%) scale(1.25, .75);             animation-timing-function: ease-out; }
+  66%  { transform: translate(-268%, 235%) scale(1);                     animation-timing-function: ease-in; }
+  78%  { transform: translate(-312%, 437%) scale(1);                     animation-timing-function: ease-out; }
+  82%  { transform: translate(-312%, 437%) scale(1.3, .7);               animation-timing-function: ease-in-out; }
+  /* pavio aceso: treme antes de disparar */
+  88%  { transform: translate(-304%, 437%) scale(1.42, .58); }
+  92%  { transform: translate(-320%, 437%) scale(1.45, .55); }
+  96%  { transform: translate(-305%, 437%) scale(1.5, .5); }
+  100% { transform: translate(-312%, 437%) scale(1.5, .5); }
+}
+/* Enquanto ela é o rojão e o show acontece, a bolinha some... */
+body.ipc-reveillon .ipc-logo-ball.ipc-rv-oculta {
+  visibility: hidden;
+}
+/* ...e volta com um "pop" quando o cometa chega no pingo do "i". */
+body.ipc-reveillon .ipc-logo-ball.ipc-rv-volta {
+  transform-origin: 50% 50%;
+  animation: ipc-rv-pop .5s cubic-bezier(.34, 1.56, .64, 1) 1 both;
+}
+@keyframes ipc-rv-pop {
+  0%   { transform: scale(0); }
+  60%  { transform: scale(1.5); }
+  100% { transform: scale(1); }
+}
+
+/* ---------- Céu dos fogos: canvas do tamanho exato da faixa amarela ---------- */
+.ipc-rv-ceu {
+  position: absolute;
+  z-index: 60;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.ipc-reveillon .ipc-logo-ball,
+  body.ipc-reveillon .ipc-logo-ball.ipc-rv-volta { animation: none; }
+  .ipc-rv-ceu { display: none; }
+}

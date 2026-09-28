@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>trilha.lab — teste de animações</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topo">
+  <div class="wrap topo-in">
+    <a class="marca" href="#">
+      <svg class="marca-ico" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="currentColor"/><path d="M8 21c3-1 3-7 7-8s4 5 9 2" fill="none" stroke="#141416" stroke-width="3" stroke-linecap="round"/></svg>
+      <span>trilha.lab</span>
+    </a>
+    <nav><a href="entrar.html">Entrar</a></nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap hero-grid">
+
+      <div class="palco" id="palco">
+        <svg id="mapa" viewBox="0 0 600 520" aria-hidden="true">
+          <defs>
+            <filter id="suave" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"/></filter>
+            <radialGradient id="vinheta" cx="50%" cy="45%" r="70%">
+              <stop offset="55%" stop-color="#141416" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#141416" stop-opacity=".85"/>
+            </radialGradient>
+            <linearGradient id="perfil-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ff634f" stop-opacity=".35"/>
+              <stop offset="1" stop-color="#ff634f" stop-opacity="0"/>
+            </linearGradient>
+            <pattern id="pontos" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".7" fill="#fff" fill-opacity=".05"/></pattern>
+            <radialGradient id="fade-g" cx="50%" cy="48%" r="58%">
+              <stop offset="60%" stop-color="#fff"/>
+              <stop offset="100%" stop-color="#000"/>
+            </radialGradient>
+            <mask id="fade"><rect width="600" height="520" fill="url(#fade-g)"/></mask>
+            <clipPath id="perfil-clip"><rect id="perfil-rev" x="0" y="0" width="0" height="520"/></clipPath>
+          </defs>
+          <g mask="url(#fade)"><g id="relevo" class="camada"></g></g>
+          <g id="rota">
+            <path id="fantasma" class="fantasma"/>
+            <path id="brilho" class="brilho"/>
+            <path id="trilha" class="trilha"/>
+            <g id="pontos-rota"></g>
+            <circle class="sonar" r="6"/><circle class="sonar s2" r="6"/><circle class="sonar s3" r="6"/>
+            <circle id="cabeca-anel" class="cabeca-anel" r="9"/>
+            <circle id="cabeca" class="cabeca" r="4.5"/>
+          </g>
+          <g id="perfil">
+            <line class="perfil-base" x1="22" x2="578" y1="452" y2="452"/>
+            <g clip-path="url(#perfil-clip)">
+              <path id="perfil-area" class="perfil-area"/>
+              <path id="perfil-linha" class="perfil-linha"/>
+            </g>
+            <circle id="perfil-cursor" class="perfil-cursor" r="2.6"/>
+          </g>
+        </svg>
+
+        <div class="hud">
+          <div class="m"><small>Distância</small><b id="h-dist">0,00<i>km</i></b></div>
+          <div class="m"><small>Tempo</small><b id="h-tempo">0:00:00</b></div>
+          <div class="m"><small>Ritmo</small><b id="h-ritmo">0:00<i>/km</i></b></div>
+          <div class="m"><small>FC</small><b id="h-fc">0<i>bpm</i></b></div>
+        </div>
+        <svg class="selo" id="selo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="currentColor"/><path d="M8 21c3-1 3-7 7-8s4 5 9 2" fill="none" stroke="#141416" stroke-width="3" stroke-linecap="round"/></svg>
+        <div class="pronto" id="pronto">
+          <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="7.5" fill="#8fe3b0"/><path d="M4.6 8.3l2.2 2.2 4.6-4.9" fill="none" stroke="#141416" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="pronto-txt">Rota pronta</span>
+        </div>
+        <div class="escala"><i></i><span>1 KM</span></div>
+        <div class="status"><i id="status-dot"></i><span id="status-txt">Traçando rota</span></div>
+        <div class="nome-rota"><b id="rota-nome">—</b><span id="rota-sub">—</span></div>
+      </div>
+
+      <div class="texto">
+        <!-- TEXTOS DO HERO: cole aqui (ou use ?editar na URL e cole direto no navegador) -->
+        <p class="sobre entra" style="--d:0" data-texto="sobre">Protótipo de animação</p>
+        <h1 class="entra" style="--d:1"><span class="h1-a" data-texto="h1-branco">Cada passo desenhado.</span><br><span class="h1-b" data-texto="h1-coral">Cada metro contado.</span></h1>
+        <p class="lead entra" style="--d:2" data-texto="lead">Página de testes para movimento: relevo gerado por código, rota traçada em tempo real, contadores que acompanham o traçado e seções que aparecem ao rolar.</p>
+        <div class="acoes entra" style="--d:3">
+          <a class="btn btn-pri" href="entrar.html" data-texto="btn-1">Começar</a>
+          <button class="btn btn-sec" id="replay" type="button" data-texto="btn-2">Rever animação</button>
+        </div>
+        <p class="nota entra" style="--d:4" data-texto="nota">Atalhos: R reinicia · → próxima rota · ?speed=2 acelera.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="recursos" id="recursos">
+    <div class="wrap recursos-grid">
+      <!-- TEXTOS DAS 3 COLUNAS -->
+      <div class="rec" data-anim="tracar"><p class="num">01</p><h2 data-texto="c1-titulo">Traçar</h2><p data-texto="c1-texto">A linha avança pelo mapa com um brilho suave por baixo, e cada ponto de passagem aparece com um pulso.</p></div>
+      <div class="rec" data-anim="pulsar"><p class="num">02</p><h2 data-texto="c2-titulo">Medir</h2><p data-texto="c2-texto">Distância, tempo, ritmo e batimentos sobem junto com a linha, calculados a partir do relevo sob a rota.</p></div>
+      <div class="rec" data-anim="recuperar"><p class="num">03</p><h2 data-texto="c3-titulo">Revelar</h2><p data-texto="c3-texto">Ao terminar, a rota pisca, o selo de concluído entra e o mapa desliza para o próximo percurso.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer class="rodape">
+  <div class="wrap rodape-in">
+    <a class="marca" href="#">
+      <svg class="marca-ico" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="currentColor"/><path d="M8 21c3-1 3-7 7-8s4 5 9 2" fill="none" stroke="#141416" stroke-width="3" stroke-linecap="round"/></svg>
+      <span>trilha.lab</span>
+    </a>
+    <span class="rodape-nota">Página local para teste de animações.</span>
+  </div>
+</footer>
+
+<script src="textos.js"></script>
+<script src="trilha.js"></script>
+</body>
+</html>

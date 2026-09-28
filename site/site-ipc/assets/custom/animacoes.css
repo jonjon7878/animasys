@@ -1,0 +1,153 @@
+/* Animações de teste — IPC Comercial (cópia local) */
+
+/* ---------- 1. Botão do WhatsApp: só o logo, expande no hover ---------- */
+.wa-chat-wrapper .wa-chat-header {
+  width: auto !important;
+  padding: 12px !important;
+  border-radius: 999px !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .22);
+  transition: box-shadow .3s ease, transform .3s ease;
+  animation: ipc-wa-pulse 2.4s ease-out infinite;
+}
+.wa-chat-wrapper .wa-chat-header a {
+  display: flex !important;
+  align-items: center;
+  text-decoration: none;
+}
+.wa-chat-wrapper .wa-chat-icon {
+  flex: 0 0 auto;
+  transition: transform .35s ease;
+}
+.wa-chat-wrapper .wa-chat-title {
+  display: inline-block;
+  max-width: 0;
+  margin: 0 !important;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: middle;
+  transition: max-width .4s ease, margin-left .4s ease, opacity .25s ease;
+}
+.wa-chat-wrapper .wa-chat-header:hover {
+  animation: none;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .28);
+}
+.wa-chat-wrapper .wa-chat-header:hover .wa-chat-title {
+  max-width: 120px;
+  margin: 0 6px 0 10px !important;
+  opacity: 1;
+  transition: max-width .4s ease, margin-left .4s ease, opacity .3s ease .1s;
+}
+.wa-chat-wrapper .wa-chat-header:hover .wa-chat-icon {
+  transform: rotate(-12deg);
+}
+@keyframes ipc-wa-pulse {
+  0%   { box-shadow: 0 6px 18px rgba(0,0,0,.22), 0 0 0 0 rgba(87, 187, 99, .55); }
+  70%  { box-shadow: 0 6px 18px rgba(0,0,0,.22), 0 0 0 14px rgba(87, 187, 99, 0); }
+  100% { box-shadow: 0 6px 18px rgba(0,0,0,.22), 0 0 0 0 rgba(87, 187, 99, 0); }
+}
+
+/* ---------- 2. Categorias em círculo: menores, crescem no hover ---------- */
+#banner-shop .banner-item a {
+  display: block;
+}
+#banner-shop .banner-item img {
+  transform: scale(.8);
+  transform-origin: center;
+  transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), filter .35s ease;
+  will-change: transform;
+}
+#banner-shop .banner-item:hover img,
+#banner-shop .banner-item a:focus-visible img {
+  transform: scale(1.02);
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, .12));
+}
+
+/* ---------- 3. Produto adicionado à sacola ---------- */
+.ipc-fly-img {
+  position: fixed;
+  z-index: 100000;
+  pointer-events: none;
+  object-fit: contain;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+}
+
+.link-shopping-cart.ipc-cart-bump .icon-shopping-cart {
+  animation: ipc-cart-bump .6s cubic-bezier(.34, 1.56, .64, 1);
+}
+.ipc-count-pop {
+  display: inline-block;
+  animation: ipc-count-pop .5s ease;
+}
+@keyframes ipc-cart-bump {
+  0%   { transform: scale(1) rotate(0); }
+  30%  { transform: scale(1.35) rotate(-10deg); }
+  60%  { transform: scale(.9) rotate(6deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+@keyframes ipc-count-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.8); color: #1e7f3c; }
+  100% { transform: scale(1); }
+}
+
+.btn-buy-kit.ipc-added {
+  background: #1e7f3c !important;
+  border-color: #1e7f3c !important;
+  color: #fff !important;
+  transition: background .25s ease;
+}
+
+
+
+/* ---------- 4. Logo: bolinha desce a escada e volta com um super impulso ---------- */
+/* Medidas em % da imagem original (205x90): bolinha em x50 y2, 16px.
+   Nos translate, 100% = diâmetro da bolinha. Degraus: barra 2 (topo y43),
+   barra 1 (topo y66), chão (y88). Roda uma vez por carregamento.
+   A altura dos pulos vem de --ipc-ball-apex / --ipc-ball-hop, calculadas no JS
+   para a bolinha nunca sair da faixa amarela (sem JS: pulo baixo). */
+.logo a.ipc-logo-anim {
+  position: relative;
+}
+.ipc-logo-ball {
+  position: absolute;
+  left: 24.39%;
+  top: 2.22%;
+  width: 7.8%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #15161a;
+  transform-origin: 50% 100%;
+  pointer-events: none;
+  animation: ipc-ball-escada 2.6s .6s 1 both;
+}
+@keyframes ipc-ball-escada {
+  0%   { transform: translate(0, 0) scale(1);               animation-timing-function: ease-out; }
+  5%   { transform: translate(0, 0) scale(1.18, .82);        animation-timing-function: ease-out; }
+  12%  { transform: translate(-60%, var(--ipc-ball-hop, -10%)) scale(.95, 1.05);  animation-timing-function: ease-in; }
+  21%  { transform: translate(-109%, 156%) scale(1);          animation-timing-function: ease-out; }
+  23%  { transform: translate(-109%, 156%) scale(1.25, .75); animation-timing-function: ease-out; }
+  31%  { transform: translate(-165%, 95%) scale(1);          animation-timing-function: ease-in; }
+  40%  { transform: translate(-216%, 300%) scale(1);          animation-timing-function: ease-out; }
+  42%  { transform: translate(-216%, 300%) scale(1.25, .75); animation-timing-function: ease-out; }
+  50%  { transform: translate(-268%, 235%) scale(1);          animation-timing-function: ease-in; }
+  59%  { transform: translate(-312%, 437%) scale(1);          animation-timing-function: ease-out; }
+  62%  { transform: translate(-312%, 437%) scale(1.3, .7);    animation-timing-function: ease-in-out; }
+  /* carregando o impulso */
+  70%  { transform: translate(-312%, 437%) scale(1.55, .45); animation-timing-function: cubic-bezier(.15, .9, .3, 1); }
+  /* super impulso: estica na subida */
+  76%  { transform: translate(-230%, 60%) scale(.72, 1.45);  animation-timing-function: ease-out; }
+  84%  { transform: translate(-90%, var(--ipc-ball-apex, -10%)) scale(.95, 1.08); animation-timing-function: ease-in; }
+  93%  { transform: translate(0, 0) scale(1.3, .72);          animation-timing-function: ease-out; }
+  97%  { transform: translate(0, calc(var(--ipc-ball-hop, -10%) * .4)) scale(.94, 1.06);      animation-timing-function: ease-in; }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-chat-wrapper .wa-chat-header { animation: none; }
+  #banner-shop .banner-item img { transition: none; }
+  .ipc-logo-ball { animation: none; }
+}
