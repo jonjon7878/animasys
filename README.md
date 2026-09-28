@@ -26,31 +26,31 @@ Só o administrador (joaogvalim@gmail.com) adiciona apps e animações e libera 
 3. **Authentication → Sign In / Providers → Email**: deixe **Confirm email** ligado.
    Isso impede que alguém se cadastre com o e-mail de outra pessoa, inclusive o do admin.
 4. **Authentication → URL Configuration**:
-   - Site URL: `https://animasys.com`
-   - Redirect URLs: `https://animasys.com/**`, `https://www.animasys.com/**` e `https://animasys.onrender.com/**`
+   - Site URL: `https://animasys.com.br`
+   - Redirect URLs: `https://animasys.com.br/**`, `https://www.animasys.com.br/**` e `https://animasys.onrender.com/**`
 5. **Project Settings → API**: anote a **Project URL** e a chave **anon public**. Elas vão para o Render.
 
 ### 2. Resend (e-mails)
-1. Em [resend.com](https://resend.com) → **Domains**, adicione `animasys.com` e crie no seu registrador os registros DNS que ele mostrar.
+1. Em [resend.com](https://resend.com) → **Domains**, adicione `animasys.com.br` e crie no seu registrador os registros DNS que ele mostrar.
 2. **API Keys → Create**: crie uma chave.
 3. No **SQL Editor** do Supabase, rode trocando a chave:
    ```sql
    select vault.create_secret('re_SUA_CHAVE', 'resend_api_key');
-   select vault.create_secret('animasys <avisos@animasys.com>', 'email_remetente');
+   select vault.create_secret('animasys <avisos@animasys.com.br>', 'email_remetente');
    ```
 4. Recomendado: **Authentication → Emails → SMTP Settings** no Supabase, para os e-mails de confirmação
    e de "esqueci a senha" também saírem pelo Resend (o envio padrão do Supabase é bem limitado):
-   host `smtp.resend.com`, porta `465`, usuário `resend`, senha = a chave do Resend, remetente `avisos@animasys.com`.
+   host `smtp.resend.com`, porta `465`, usuário `resend`, senha = a chave do Resend, remetente `avisos@animasys.com.br`.
 
 ### 3. Render
 1. **New → Blueprint**, escolha o repositório **animasys**. O Render lê o `render.yaml`.
 2. Preencha `SUPABASE_URL` e `SUPABASE_ANON_KEY` com os valores do passo 1.5 e confirme.
 3. Quando terminar, o site abre em `https://animasys.onrender.com`.
 
-### 4. Domínio animasys.com
-1. No Render, abra o serviço **animasys → Settings → Custom Domains**. `animasys.com` e `www.animasys.com` já aparecem listados.
+### 4. Domínio animasys.com.br
+1. No Render, abra o serviço **animasys → Settings → Custom Domains**. `animasys.com.br` e `www.animasys.com.br` já aparecem listados.
 2. No painel onde você comprou o domínio, crie os registros que o Render mostrar. Normalmente são:
-   - `A` em `animasys.com` apontando para o IP informado pelo Render;
+   - `A` em `animasys.com.br` apontando para o IP informado pelo Render;
    - `CNAME` em `www` apontando para `animasys.onrender.com`.
 3. O certificado HTTPS sai sozinho quando o DNS propagar (de minutos a algumas horas).
 

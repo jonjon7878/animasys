@@ -10,8 +10,8 @@ services:
       - key: SUPABASE_ANON_KEY
         sync: false
     domains:
-      - animasys.com
-      - www.animasys.com
+      - animasys.com.br
+      - www.animasys.com.br
     headers:
       - path: /*
         name: X-Frame-Options

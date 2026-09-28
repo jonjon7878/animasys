@@ -52,7 +52,7 @@ $$;
 -- E-mails (Resend, direto do banco)
 -- A chave fica no Vault, nunca no código:
 --   select vault.create_secret('re_SUA_CHAVE', 'resend_api_key');
---   select vault.create_secret('animasys <avisos@animasys.com>', 'email_remetente');
+--   select vault.create_secret('animasys <avisos@animasys.com.br>', 'email_remetente');
 -- Sem a chave, nada é enviado e o resto funciona normalmente.
 -- ------------------------------------------------------------------
 
